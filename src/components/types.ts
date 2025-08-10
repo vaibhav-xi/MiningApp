@@ -1,0 +1,38 @@
+export type RootStackParamList = {
+  Splash: undefined;
+  Login: undefined;
+  SignUp: undefined;
+  ForgotPassword: undefined;
+  OTPVerification: {
+    email: string;
+    type: 'forgot_password' | 'email_verification';
+    user?: any;
+    token?: string;
+    fromLogin?: boolean;
+  };
+  ChangePassword: { email: string; resetToken: string; };
+  Main: undefined;
+  TwofactorOTP: {token: string;user: any; };
+  ReferralScreen: {token: string;user: any; fromLogin?: boolean; };
+  MyProfileScreen: undefined;
+  UpdateEmail: undefined;
+  TwoFactorScreen: undefined;
+  NotificationPrefs: undefined;
+  HelpCenter: undefined;
+  ContactSupport: undefined;
+  Page: undefined;
+  AllActivity: undefined;
+  InternalReferral: undefined;
+  Wallet: undefined;
+  DepositScreen: undefined;
+  WithdrawScreen: undefined;
+  FAQScreen: undefined;
+  SupportScreen: undefined;
+  Store: undefined;
+  MakePaymentScreen: {package_id: any; };
+  CustomQuote: undefined;
+  DeleteAccount: undefined;
+  NotificationScreen: undefined;
+  Sidebar: undefined;
+  AchievementsScreen: undefined;
+};
