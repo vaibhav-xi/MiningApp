@@ -52,9 +52,14 @@ const MyProfileScreen = () => {
         <TouchableOpacity
           style={styles.row}
           onPress={() => {
+<<<<<<< HEAD
             navigation.navigate('ForgotPassword', {
               screen_heading: 'Change Password'
             });
+=======
+            // TODO: Implement ChangePassword screen
+            console.log('Change Password clicked');
+>>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
           }}
         >
           <View style={styles.rowLine} />
@@ -77,7 +82,12 @@ const MyProfileScreen = () => {
         <TouchableOpacity
           style={styles.row}
           onPress={() => {
+<<<<<<< HEAD
             navigation.navigate('TwoFactorScreen');
+=======
+            // TODO: Implement TwoFactorScreen
+            console.log('Two Factor Authentication clicked');
+>>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
           }}
         >
           <View style={styles.rowLine} />
@@ -88,7 +98,12 @@ const MyProfileScreen = () => {
         <TouchableOpacity
           style={styles.row}
           onPress={() => {
+<<<<<<< HEAD
             navigation.navigate('NotificationPreferencesScreen');
+=======
+            // TODO: Implement NotificationPrefs screen
+            console.log('Notification Preferences clicked');
+>>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
           }}
         >
           <View style={styles.rowLine} />

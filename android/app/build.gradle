@@ -124,7 +124,10 @@ dependencies {
 
     // Google Sign-in
     implementation 'com.google.android.gms:play-services-auth:20.7.0'
+<<<<<<< HEAD
     implementation 'androidx.annotation:annotation:1.6.0'
+=======
+>>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
 
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")

@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import React, { useState, useEffect, useRef } from 'react';
+=======
+import React, { useState } from 'react';
+>>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
 import {
   View,
   Text,
@@ -19,16 +23,22 @@ import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../components/types';
 
+<<<<<<< HEAD
 import { HOMEBANNER_AD_UNIT_ID, showRewardedAd } from '../services/googleAds';
 import { BannerAd, BannerAdSize } from 'react-native-google-mobile-ads';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+=======
+>>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
 interface GradientButtonProps {
   icon?: string;
   text: string;
   fullWidth?: boolean;
   onPress?: () => void;
+<<<<<<< HEAD
   disabled?: boolean; 
+=======
+>>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
 }
 
 interface StatCardProps {
@@ -50,23 +60,30 @@ interface ActionCardProps {
   label: string;
 }
 
+<<<<<<< HEAD
 const MAX_ADS = 10;
 const BASE_HASHPOWER_PER_AD = 5;
 const BTC_PER_HASHPOWER_PER_SEC = 0.000000000001;
 
+=======
+>>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
 const Page: React.FC = () => {
   const { user } = useAuth();
   const [sidebarVisible, setSidebarVisible] = useState(false);
   const data = [50, 10, 40, 95, 85, 91, 35];
 
+<<<<<<< HEAD
   const [btcBalance, setBtcBalance] = useState(0);
   const [hashPower, setHashPower] = useState(0);
   const [adsWatched, setAdsWatched] = useState(0);
 
+=======
+>>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
   type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Page'>;
 
   const navigation = useNavigation<HomeScreenNavigationProp>();
 
+<<<<<<< HEAD
   const handleReward = async (amount: number, type: string) => {
     console.log(`User earned reward: ${amount} ${type}`);
 
@@ -144,6 +161,8 @@ const Page: React.FC = () => {
     };
   }, [hashPower]);
 
+=======
+>>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
   return (
     <View style={{ flex: 1 }}>
       <Sidebar visible={sidebarVisible} onClose={() => setSidebarVisible(false)}/>
@@ -171,6 +190,7 @@ const Page: React.FC = () => {
           <Text style={styles.subText}>Your digital assets at glance.</Text>
         </LinearGradient>
 
+<<<<<<< HEAD
         <LinearGradient
           colors={['#70ecffff', '#a694b8ff']}
           start={{ x: 0, y: 0 }}
@@ -199,6 +219,17 @@ const Page: React.FC = () => {
             value={`${hashPower.toLocaleString()} TH/s`} 
             label="Current Hashrate" 
           />
+=======
+        <View style={styles.buttonRow}>
+          <GradientButton icon="gift" text="Daily Rewards" />
+          <GradientButton icon="play-circle" text="Watch Videos" />
+        </View>
+        <GradientButtonB icon="credit-card-outline" text="Paid Plans" fullWidth />
+
+        <View style={styles.cardRow}>
+          <StatCard icon="currency-usd" value="$12.50" label="Daily Profit" />
+          <StatCard icon="chart-line" value="200 TH/s" label="Current Hashrate" />
+>>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
           <StatCard icon="speedometer" value="98%" label="Efficiency" />
         </View>
 
@@ -266,6 +297,7 @@ const Page: React.FC = () => {
           
         </View>
       </ScrollView>
+<<<<<<< HEAD
 
       <View style={styles.bannerContainer}>
         <BannerAd
@@ -276,18 +308,28 @@ const Page: React.FC = () => {
           }}
         />
       </View>
+=======
+>>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
     </View>
   );
 };
 
+<<<<<<< HEAD
 const GradientButton: React.FC<GradientButtonProps> = ({ icon, text, onPress, disabled = false }) => (
+=======
+const GradientButton: React.FC<GradientButtonProps> = ({ icon, text }) => (
+>>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
   <LinearGradient
     colors={['#22D3EE', '#C084FC']}
     start={{ x: 0, y: 0 }}
     end={{ x: 1, y: 0 }}
     style={[styles.gradientButton, { width: '48%' }]}
   >
+<<<<<<< HEAD
     <TouchableOpacity style={styles.buttonContent} activeOpacity={0.8} onPress={onPress} disabled={disabled}>
+=======
+    <TouchableOpacity style={styles.buttonContent} activeOpacity={0.8}>
+>>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
       {icon && <Icon name={icon} size={18} color="#fff" style={styles.buttonIcon} />}
       <Text style={styles.buttonText}>{text}</Text>
     </TouchableOpacity>
@@ -339,6 +381,7 @@ const ActionCard: React.FC<ActionCardProps> = ({ icon, label }) => (
 export default Page;
 
 // Styles
+<<<<<<< HEAD
 const styles = StyleSheet.create({
   btcBox: {
     flexDirection: 'row',
@@ -371,12 +414,24 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: '#111827',
     marginBottom: 30
+=======
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 16,
+    backgroundColor: '#111827'
+>>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
   },
   topBar: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+<<<<<<< HEAD
     paddingBottom: 30,
+=======
+    paddingBottom: 40,
+>>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
     backgroundColor: '#111827'
   },
   profileContainer: {
@@ -564,7 +619,10 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 16,
     marginTop: 20,
+<<<<<<< HEAD
     marginBottom: 60,
+=======
+>>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
     elevation: 2,
   },
   transactionRow: {

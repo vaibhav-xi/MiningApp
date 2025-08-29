@@ -35,8 +35,12 @@
     "react": "19.1.0",
     "react-native": "0.80.0",
     "react-native-fbsdk-next": "^13.4.1",
+<<<<<<< HEAD
     "react-native-gesture-handler": "^2.28.0",
     "react-native-google-mobile-ads": "^15.4.0",
+=======
+    "react-native-gesture-handler": "^2.27.1",
+>>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
     "react-native-linear-gradient": "^2.8.3",
     "react-native-linkedin": "^2.1.1",
     "react-native-mmkv": "^3.3.0",
@@ -44,9 +48,13 @@
     "react-native-reanimated": "^3.18.0",
     "react-native-safe-area-context": "^5.5.1",
     "react-native-screens": "^4.11.1",
+<<<<<<< HEAD
     "react-native-svg": "^15.12.1",
     "react-native-vector-icons": "^10.3.0",
     "react-native-video": "^6.16.1",
+=======
+    "react-native-vector-icons": "^10.2.0",
+>>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
     "vercel": "^44.2.11"
   },
   "devDependencies": {

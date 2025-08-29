@@ -1,5 +1,9 @@
 import { StackNavigationProp } from '@react-navigation/stack';
+<<<<<<< HEAD
 import React, {useState, useEffect} from 'react';
+=======
+import React from 'react';
+>>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
 import {
   View,
   Text,
@@ -14,6 +18,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import MaterialIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { RootStackParamList } from '../components/types';
 import { useNavigation } from '@react-navigation/native';
+<<<<<<< HEAD
 import { get_data_uri } from '../config/api';
 import axios from 'axios';
 
@@ -56,6 +61,41 @@ const StoreScreen = () => {
       fetchSubscriptions();
     }, []);
 
+=======
+
+const plans = [
+  {
+    id: 1,
+    name: 'Starter Miner Pack',
+    hashrate: '10 TH/s',
+    duration: '12 Months',
+    daily_maintenance: '$0.05/TH/day',
+    price: '$99.00',
+    color: '#06B6D4',
+  },
+  { 
+    id: 2,
+    name: 'Pro Miner Pack',
+    hashrate: '50 TH/s',
+    duration: '18 Months',
+    daily_maintenance: '$0.045/TH/day',
+    price: '$449.00',
+    color: '#C084FC',
+  },
+  {
+    id: 3,
+    name: 'Enterprise Miner Pack',
+    hashrate: '200 TH/s',
+    duration: '24 Months',
+    daily_maintenance: '$0.04/TH/day',
+    price: '$1599.00',
+    color: '#F472B6',
+  },
+];
+
+const StoreScreen = () => {
+
+>>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
     type LoginScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Store'>;
     
     const navigation = useNavigation<LoginScreenNavigationProp>();
@@ -64,6 +104,7 @@ const StoreScreen = () => {
       navigation.navigate('MakePaymentScreen', { package_id: plan.id });
     };
 
+<<<<<<< HEAD
     const getRandomColor = (): string => {
       const colors = [
         '#FF5733',
@@ -78,6 +119,8 @@ const StoreScreen = () => {
       return colors[Math.floor(Math.random() * colors.length)];
     };
 
+=======
+>>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
@@ -85,6 +128,10 @@ const StoreScreen = () => {
       {/* Top Bar */}
       <View style={styles.topBar}>
         <Text style={styles.topBarTitle}>Store</Text>
+<<<<<<< HEAD
+=======
+        <View style={{ width: 24 }} />
+>>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
       </View>
 
       <ScrollView contentContainerStyle={styles.content}>
@@ -103,6 +150,7 @@ const StoreScreen = () => {
 
         {/* Available Contracts */}
         <Text style={styles.sectionTitle}>Available Contracts</Text>
+<<<<<<< HEAD
         {SubscriptionData.map((plan, index) => {
           const fcolor = getRandomColor();
 
@@ -135,6 +183,34 @@ const StoreScreen = () => {
           );
         }
         )}
+=======
+        {plans.map((plan, index) => (
+        <View key={index} style={styles.planCard}>
+          <View style={styles.planHeader}>
+            <MaterialIcon name="flash" color={plan.color} size={18} style={{ marginRight: 6 }} />
+            <Text style={styles.planTitle}>{plan.name}</Text>
+          </View>
+          <Text style={styles.planSub}>Hashrate: {plan.hashrate}</Text>
+          <Text style={styles.planSub}>Duration: {plan.duration}</Text>
+          <Text style={styles.planSub}>Daily Maintenance: {plan.daily_maintenance}</Text>
+
+          <View style={styles.planFooter}>
+            <Text style={[styles.planPrice, { color: plan.color }]}>{plan.price}</Text>
+            
+            <TouchableOpacity onPress={() => handlePurchase(plan)}>
+              <LinearGradient
+                colors={['#22D3EE', '#C084FC']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.planButton}
+              >
+                <Text style={styles.planButtonText}>Purchase Plan</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          </View>
+        </View>
+      ))}
+>>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
 
         {/* Custom Hashrate Plan */}
         <View style={styles.customBox}>
@@ -180,10 +256,16 @@ const styles = StyleSheet.create({
   },
   topBar: {
     flexDirection: 'row',
+<<<<<<< HEAD
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 16,
     position: 'relative',
+=======
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+>>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
   },
   backArrow: {
     color: 'white',

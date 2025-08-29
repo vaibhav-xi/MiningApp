@@ -15,6 +15,7 @@ import {
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { Image } from 'react-native';
+<<<<<<< HEAD
 import { get_data_uri } from '../config/api';
 import { useAuth } from '../auth/AuthProvider';
 
@@ -23,6 +24,11 @@ const SupportScreen = ({ navigation }: any) => {
   
   const [formData, setFormData] = useState({
     user: user?.id,
+=======
+
+const SupportScreen = ({ navigation }: any) => {
+  const [formData, setFormData] = useState({
+>>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
     name: '',
     email: '',
     message: '',
@@ -61,6 +67,7 @@ const SupportScreen = ({ navigation }: any) => {
 
   const handleSubmit = async () => {
     if (!validateForm()) return;
+<<<<<<< HEAD
     setIsLoading(true);
 
     try {
@@ -91,11 +98,44 @@ const SupportScreen = ({ navigation }: any) => {
             },
           },
         ]);
+=======
+
+    setIsLoading(true);
+    
+    try {
+      const response = await fetch('https://fake-mining-backend.onrender.com/api/support/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        Alert.alert(
+          'Success',
+          'Your message has been sent successfully! We will get back to you soon.',
+          [
+            {
+              text: 'OK',
+              onPress: () => {
+                setFormData({ name: '', email: '', message: '' });
+                navigation.goBack();
+              },
+            },
+          ]
+        );
+>>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
       } else {
         Alert.alert('Error', data.message || 'Failed to send message');
       }
     } catch (error) {
+<<<<<<< HEAD
       console.log("Error: ", error);
+=======
+>>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
       Alert.alert('Error', 'Network error. Please try again later.');
     } finally {
       setIsLoading(false);

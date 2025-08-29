@@ -1,5 +1,9 @@
 import { StackNavigationProp } from '@react-navigation/stack';
+<<<<<<< HEAD
 import React, { useEffect, useState, useCallback } from 'react';
+=======
+import React from 'react';
+>>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
 import {
   View,
   Text,
@@ -8,11 +12,15 @@ import {
   TouchableOpacity,
   StatusBar,
   SafeAreaView,
+<<<<<<< HEAD
   RefreshControl,
+=======
+>>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { RootStackParamList } from '../components/types';
 import { useNavigation } from '@react-navigation/native';
+<<<<<<< HEAD
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface Transaction {
@@ -67,10 +75,68 @@ const WalletScreen = () => {
   const displayedValue = showUSD
     ? `$${((btcBalance / 4) * BTC_TO_USD).toFixed(4)}`
     : `${(btcBalance / 4).toFixed(12)} BTC`;
+=======
+
+const transactions = [
+  {
+    type: 'Deposit',
+    method: 'Bank Transfer',
+    date: '2025-07-06 14:32',
+    amount: '+$500.00',
+    isPositive: true,
+  },
+  {
+    type: 'Subscription Fee',
+    method: 'Card Payment',
+    date: '2025-07-05 10:12',
+    amount: '-$29.99',
+    isPositive: false,
+  },
+  {
+    type: 'Sent Payment',
+    method: 'Crypto (BTC)',
+    date: '2025-07-04 18:00',
+    amount: '-$100.00',
+    isPositive: false,
+  },
+  {
+    type: 'Deposit',
+    method: 'Bank Transfer',
+    date: '2025-07-06 14:32',
+    amount: '+$1500.00',
+    isPositive: true,
+  },
+  {
+    type: 'Deposit',
+    method: 'Bank Transfer',
+    date: '2025-07-06 14:32',
+    amount: '+$300.00',
+    isPositive: true,
+  },
+];
+
+const WalletScreen = () => {
+  const handleDeposit = () => {
+    navigation.navigate('DepositScreen');
+  };
+
+  const handleWithdraw = () => {
+    navigation.navigate('WithdrawScreen');
+  };
+
+  const handleViewAll = () => {
+    console.log('View All Transactions');
+  };
+
+    type LoginScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Wallet'>;
+  
+    const navigation = useNavigation<LoginScreenNavigationProp>();
+>>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#15213B" />
+<<<<<<< HEAD
       <ScrollView
         contentContainerStyle={styles.scrollView}
         refreshControl={
@@ -95,6 +161,15 @@ const WalletScreen = () => {
               {showUSD ? "Show in BTC" : "Convert to USD"}
             </Text>
           </TouchableOpacity>
+=======
+      <ScrollView contentContainerStyle={styles.scrollView}>
+
+        {/* Balance Box */}
+        <View style={styles.balanceBox}>
+          <Text style={styles.balanceLabel}>Your Current Balance</Text>
+          <Text style={styles.balanceAmount}>$12,345.67</Text>
+          <Text style={styles.balanceChange}>+2.5% today</Text>
+>>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
         </View>
 
         {/* Buttons */}
@@ -125,6 +200,7 @@ const WalletScreen = () => {
         {/* Transaction History */}
         <View style={styles.transactionContainer}>
           <Text style={styles.transactionHeader}>Transaction History</Text>
+<<<<<<< HEAD
 
           {transactions.length === 0 ? (
             <View style={styles.emptyBox}>
@@ -162,6 +238,37 @@ const WalletScreen = () => {
             </>
           )}
         </View>
+=======
+          {transactions.map((txn, index) => (
+                <View
+                key={index}
+                style={[
+                    styles.transactionRow,
+                    index !== 0 && styles.transactionRowBorderTop, // Add border if not the first
+                ]}
+                >
+                <View>
+                    <Text style={styles.transactionType}>{txn.type}</Text>
+                    <Text style={styles.transactionMethod}>Method: {txn.method}</Text>
+                    <Text style={styles.transactionDate}>{txn.date}</Text>
+                </View>
+                <Text
+                    style={[
+                    styles.transactionAmount,
+                    { color: txn.isPositive ? '#10B981' : '#EF4444' },
+                    ]}
+                >
+                    {txn.amount}
+                </Text>
+                </View>
+            ))}
+
+          <TouchableOpacity style={styles.viewAllButton} onPress={handleViewAll}>
+            <Text style={styles.viewAllText}>View All Transactions</Text>
+          </TouchableOpacity>
+        </View>
+
+>>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
       </ScrollView>
     </SafeAreaView>
   );
@@ -179,7 +286,11 @@ const styles = StyleSheet.create({
     paddingTop: 60
   },
   balanceBox: {
+<<<<<<< HEAD
     backgroundColor: 'rgba(240, 255, 255, 0.17)',
+=======
+    backgroundColor: 'rgba(240, 255, 255, 0.17)', // azure with opacity
+>>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
     borderRadius: 16,
     padding: 24,
     alignItems: 'center',
@@ -192,12 +303,17 @@ const styles = StyleSheet.create({
   },
   balanceAmount: {
     color: '#FFFFFF',
+<<<<<<< HEAD
     fontSize: 28,
+=======
+    fontSize: 36,
+>>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
     fontWeight: 'bold',
   },
   balanceChange: {
     color: '#34D399',
     fontSize: 14,
+<<<<<<< HEAD
     marginTop: 10,
   },
   convertButton: {
@@ -211,6 +327,9 @@ const styles = StyleSheet.create({
     color: '#F9FAFB',
     fontSize: 14,
     fontWeight: '500',
+=======
+    marginTop: 4,
+>>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
   },
   buttonRow: {
     flexDirection: 'row',
@@ -283,6 +402,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   transactionRowBorderTop: {
+<<<<<<< HEAD
     borderTopWidth: 1,
     borderTopColor: '#334155',
     paddingTop: 16,
@@ -298,4 +418,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontStyle: 'italic',
   },
+=======
+  borderTopWidth: 1,
+  borderTopColor: '#334155',
+  paddingTop: 16,
+  marginTop: 16,
+},
+>>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
 });

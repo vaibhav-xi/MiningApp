@@ -1,5 +1,9 @@
+<<<<<<< HEAD
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+=======
+import React, { useState } from 'react';
+>>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
 import {
   View,
   Text,
@@ -12,6 +16,7 @@ import {
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { Image } from 'react-native';
+<<<<<<< HEAD
 import { get_data_uri } from '../config/api';
 import Icon from 'react-native-vector-icons/Ionicons';
 
@@ -54,12 +59,71 @@ const FAQScreen = ({ navigation }: any) => {
   const toggleExpanded = (id: string) => {
     setExpandedItems(prev =>
       prev.includes(id)
+=======
+
+interface FAQItem {
+  id: number;
+  question: string;
+  answer: string;
+}
+
+const FAQScreen = ({ navigation }: any) => {
+  const [expandedItems, setExpandedItems] = useState<number[]>([]);
+
+  const faqData: FAQItem[] = [
+    {
+      id: 1,
+      question: 'What is Bitcoin mining?',
+      answer: 'Bitcoin mining involves solving complex mathematical problems to validate transactions on the blockchain, earning newly minted bitcoins as rewards.',
+    },
+    {
+      id: 2,
+      question: 'Do I need special hardware?',
+      answer: 'While specialized ASIC miners are most efficient, our app allows you to start with basic hardware and gradually upgrade as you earn more.',
+    },
+    {
+      id: 3,
+      question: 'Can I mine on my phone?',
+      answer: 'Our app provides mobile monitoring and management of your mining operations, though actual mining requires dedicated hardware for optimal results.',
+    },
+    {
+      id: 4,
+      question: 'How do I withdraw earnings?',
+      answer: 'You can withdraw your earnings to your personal wallet once you reach the minimum threshold. Go to Wallet > Withdraw and follow the instructions.',
+    },
+    {
+      id: 5,
+      question: 'Is Bitcoin mining profitable?',
+      answer: 'Profitability depends on electricity costs, hardware efficiency, and Bitcoin price. Our app provides real-time profitability calculators to help you make informed decisions.',
+    },
+    {
+      id: 6,
+      question: 'How secure is my account?',
+      answer: 'We use industry-standard encryption, two-factor authentication, and secure wallet integration to protect your account and earnings.',
+    },
+    {
+      id: 7,
+      question: 'What are mining pools?',
+      answer: 'Mining pools combine computational power from multiple miners to increase chances of solving blocks and earning rewards, which are then distributed among participants.',
+    },
+    {
+      id: 8,
+      question: 'How often are rewards distributed?',
+      answer: 'Rewards are distributed automatically based on your contribution to the mining pool, typically every 24 hours or when blocks are successfully mined.',
+    },
+  ];
+
+  const toggleExpanded = (id: number) => {
+    setExpandedItems(prev => 
+      prev.includes(id) 
+>>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
         ? prev.filter(item => item !== id)
         : [...prev, id]
     );
   };
 
   const renderFAQItem = (item: FAQItem) => {
+<<<<<<< HEAD
     const isExpanded = expandedItems.includes(item._id);
 
     return (
@@ -70,14 +134,33 @@ const FAQScreen = ({ navigation }: any) => {
           activeOpacity={0.7}
         >
           <Text style={styles.questionText}>{item.name}</Text>
+=======
+    const isExpanded = expandedItems.includes(item.id);
+    
+    return (
+      <View key={item.id} style={styles.faqItem}>
+        <TouchableOpacity
+          style={styles.questionContainer}
+          onPress={() => toggleExpanded(item.id)}
+          activeOpacity={0.7}
+        >
+          <Text style={styles.questionText}>{item.question}</Text>
+>>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
           <Text style={[styles.expandIcon, isExpanded && styles.expandIconRotated]}>
             ▼
           </Text>
         </TouchableOpacity>
+<<<<<<< HEAD
 
         {isExpanded && (
           <View style={styles.answerContainer}>
             <Text style={styles.answerText}>{item.message}</Text>
+=======
+        
+        {isExpanded && (
+          <View style={styles.answerContainer}>
+            <Text style={styles.answerText}>{item.answer}</Text>
+>>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
           </View>
         )}
       </View>
@@ -94,6 +177,7 @@ const FAQScreen = ({ navigation }: any) => {
       
       {/* Header */}
       <View style={styles.header}>
+<<<<<<< HEAD
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.goBack()}
@@ -102,6 +186,10 @@ const FAQScreen = ({ navigation }: any) => {
         </TouchableOpacity>
 
         <Text style={styles.headerTitle}>FAQ</Text>
+=======
+        <Text style={styles.headerTitle}>FAQ</Text>
+        <View style={styles.placeholder} />
+>>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
       </View>
 
       {/* FAQ Icon */}
@@ -119,6 +207,7 @@ const FAQScreen = ({ navigation }: any) => {
              {/* Form */}
 
       {/* FAQ List */}
+<<<<<<< HEAD
 
       {
         loading ? (
@@ -141,6 +230,19 @@ const FAQScreen = ({ navigation }: any) => {
         
         )
       }
+=======
+      <ScrollView 
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
+        <Text style={styles.sectionTitle}>Frequently Asked Questions</Text>
+        
+        {faqData.map(renderFAQItem)}
+        
+        <View style={styles.bottomSpacing} />
+      </ScrollView>
+>>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
 
       {/* Background Decoration */}
       <View style={styles.backgroundDecoration}>
@@ -171,6 +273,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+<<<<<<< HEAD
     paddingVertical: 16,
     position: 'relative',
   },
@@ -184,12 +287,34 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     textAlign: 'center',
+=======
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#2d2d44',
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#2d2d44',
+    alignItems: 'center',
+    justifyContent: 'center',
+>>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
   },
   backButtonText: {
     color: '#00d4ff',
     fontSize: 20,
     fontWeight: 'bold',
   },
+<<<<<<< HEAD
+=======
+  headerTitle: {
+    color: '#ffffff',
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+>>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
   placeholder: {
     width: 40,
   },
