@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 import React, { useState, useEffect, useRef } from 'react';
-=======
-import React, { useState } from 'react';
->>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
 import {
   View,
   Text,
@@ -12,6 +8,7 @@ import {
   ViewStyle,
   TextStyle,
   ImageStyle,
+  Platform
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -23,22 +20,19 @@ import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../components/types';
 
-<<<<<<< HEAD
 import { HOMEBANNER_AD_UNIT_ID, showRewardedAd } from '../services/googleAds';
 import { BannerAd, BannerAdSize } from 'react-native-google-mobile-ads';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { API_ENDPOINTS, get_data_uri } from '../config/api';
+import LottieView from 'lottie-react-native';
+import miningCardAnimation from '../assets/animations/mining-card.json';
 
-=======
->>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
 interface GradientButtonProps {
   icon?: string;
   text: string;
   fullWidth?: boolean;
   onPress?: () => void;
-<<<<<<< HEAD
   disabled?: boolean; 
-=======
->>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
 }
 
 interface StatCardProps {
@@ -58,35 +52,47 @@ interface InfoCardProps {
 interface ActionCardProps {
   icon: string;
   label: string;
+  onPress?: () => void;
 }
 
-<<<<<<< HEAD
 const MAX_ADS = 10;
 const BASE_HASHPOWER_PER_AD = 5;
 const BTC_PER_HASHPOWER_PER_SEC = 0.000000000001;
+const MAX_MINING_DURATION = 24 * 60 * 60 * 1000;
+const now = new Date();
+const oneDay = 24 * 60 * 60 * 1000;
 
-=======
->>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
+type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Page'>;
+
 const Page: React.FC = () => {
   const { user } = useAuth();
   const [sidebarVisible, setSidebarVisible] = useState(false);
-  const data = [50, 10, 40, 95, 85, 91, 35];
 
-<<<<<<< HEAD
   const [btcBalance, setBtcBalance] = useState(0);
   const [hashPower, setHashPower] = useState(0);
   const [adsWatched, setAdsWatched] = useState(0);
-
-=======
->>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
-  type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Page'>;
+  const [startTime, setStartTime] = useState<number | null>(null);
+  const [loadingBalance, setLoadingBalance] = useState(true);
 
   const navigation = useNavigation<HomeScreenNavigationProp>();
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const balanceRef = useRef(btcBalance);
+  const miningAnimationRef = useRef<LottieView>(null);
 
-<<<<<<< HEAD
+  const [user_referrals, setUserReferrals] = useState(0);
+
+  interface Activity {
+    type: string;
+    amount: number;
+    crypto: string;
+  }
+
+  const [recent_activity_list, setRecentActivityList] = useState<Activity[]>([]);
+
+  // -----------------------------
+  // Reward Handler (Ad Watched)
+  // -----------------------------
   const handleReward = async (amount: number, type: string) => {
-    console.log(`User earned reward: ${amount} ${type}`);
-
     if (adsWatched >= MAX_ADS) return;
 
     const newAdsCount = adsWatched + 1;
@@ -95,90 +101,222 @@ const Page: React.FC = () => {
     setAdsWatched(newAdsCount);
     setHashPower(newHashPower);
 
-    await AsyncStorage.setItem("adsWatched", newAdsCount.toString());
-    await AsyncStorage.setItem("hashPower", newHashPower.toString());
+    if (!startTime) {
+      const now = Date.now();
+      setStartTime(now);
+      await AsyncStorage.setItem('startTime', now.toString());
+    }
+
+    await AsyncStorage.setItem('adsWatched', newAdsCount.toString());
+    await AsyncStorage.setItem('hashPower', newHashPower.toString());
   };
 
   const { show, loading, loaded } = showRewardedAd(handleReward);
 
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
-
+  // -----------------------------
+  // Load State from AsyncStorage
+  // -----------------------------
   useEffect(() => {
+    console.log("UseEffect #1");
     const loadData = async () => {
       try {
-        const storedBtc = await AsyncStorage.getItem("btcBalance");
-        const storedHash = await AsyncStorage.getItem("hashPower");
-        const storedAds = await AsyncStorage.getItem("adsWatched");
-        const lastTimestamp = await AsyncStorage.getItem("lastTimestamp");
 
-        const btc = storedBtc ? parseFloat(storedBtc) : 0;
-        const hash = storedHash ? parseInt(storedHash) : 0;
-        const ads = storedAds ? parseInt(storedAds) : 0;
-
-        if (lastTimestamp) {
-          const now = Date.now();
-          const elapsed = Math.floor((now - parseInt(lastTimestamp)) / 1000);
-          const mined = elapsed * hash * BTC_PER_HASHPOWER_PER_SEC;
-          setBtcBalance(btc + mined);
+        if (!user?.id) {
+          console.log("User not ready, skipping fetchBalance");
+          return;
         } else {
-          setBtcBalance(btc);
+          console.log("User is not Null");
         }
 
-        setHashPower(hash);
-        setAdsWatched(ads);
+        const storedHash = await AsyncStorage.getItem('hashPower');
+        const storedAds = await AsyncStorage.getItem('adsWatched');
+        const storedStart = await AsyncStorage.getItem('startTime');
+        const storedBtc = await AsyncStorage.getItem('btcBalance');
+
+        setHashPower(storedHash ? parseInt(storedHash) : 0);
+        setAdsWatched(storedAds ? parseInt(storedAds) : 0);
+
+        if (storedStart) {
+          const start = parseInt(storedStart);
+          const now = Date.now();
+          if (now - start < MAX_MINING_DURATION) {
+            setStartTime(start);
+          }
+        }
+
+        if (storedBtc) {
+          setBtcBalance(parseFloat(storedBtc));
+        }
+        await fetchBalance();
+
       } catch (e) {
-        console.error("Error loading mining state", e);
+        console.error('Error loading mining state', e);
       }
     };
 
     loadData();
   }, []);
 
+  // -----------------------------
+  // Save Local State
+  // -----------------------------
   useEffect(() => {
     const saveData = async () => {
       try {
-        await AsyncStorage.setItem("btcBalance", btcBalance.toString());
-        await AsyncStorage.setItem("hashPower", hashPower.toString());
-        await AsyncStorage.setItem("adsWatched", adsWatched.toString());
-        await AsyncStorage.setItem("lastTimestamp", Date.now().toString());
+        await AsyncStorage.setItem('btcBalance', btcBalance.toString());
+        await AsyncStorage.setItem('hashPower', hashPower.toString());
+        await AsyncStorage.setItem('adsWatched', adsWatched.toString());
+        if (startTime) {
+          await AsyncStorage.setItem('startTime', startTime.toString());
+        }
       } catch (e) {
-        console.error("Error saving mining state", e);
+        console.error('Error saving mining state', e);
       }
     };
 
     saveData();
-  }, [btcBalance, hashPower, adsWatched]);
+  }, [btcBalance, hashPower, adsWatched, startTime]);
 
+  // -----------------------------
+  // Mining Logic
+  // -----------------------------
   useEffect(() => {
     if (intervalRef.current) clearInterval(intervalRef.current);
 
-    intervalRef.current = setInterval(() => {
-      setBtcBalance(prev => prev + hashPower * BTC_PER_HASHPOWER_PER_SEC);
-    }, 1000);
+    const isMiningActive =
+      hashPower > 0 && startTime && Date.now() - startTime < MAX_MINING_DURATION;
+
+    if (isMiningActive) {
+      intervalRef.current = setInterval(() => {
+        setBtcBalance(prev => {
+          const updated = prev + hashPower * BTC_PER_HASHPOWER_PER_SEC;
+          balanceRef.current = updated;
+          return updated;
+        });
+      }, 1000);
+
+      miningAnimationRef.current?.play();
+    } else {
+      miningAnimationRef.current?.pause();
+    }
 
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [hashPower]);
+  }, [hashPower, startTime]);
 
-=======
->>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
+  // -----------------------------
+  // API Calls
+  // -----------------------------
+  const fetchBalance = async () => {
+    try {
+      const fetch_balance_uri = `${get_data_uri('GET_WALLET_BALANCE')}?userId=${user.id}`;
+      console.log("Fetch Balance URL: ", fetch_balance_uri);
+
+      const res = await fetch(fetch_balance_uri);
+      const data = await res.json();
+
+      console.log("FETCH RES: ", res, "FETCH DATA: ", data);
+
+      if (res.ok && data.balance) {
+        const btcValue = parseFloat(
+          data.balance.BTC?.$numberDecimal ?? data.balance.BTC ?? "0"
+        );
+        const safeVal = isNaN(btcValue) ? 0 : btcValue;
+
+        setBtcBalance(safeVal);
+        balanceRef.current = safeVal;
+      }
+    } catch (err) {
+      console.error("Error fetching balance:", err);
+    } finally {
+      setLoadingBalance(false);
+    }
+  };
+
+  const syncBalance = async () => {
+    try {
+      
+      console.log("SET BALANCE URL: ", get_data_uri('SET_WALLET_BALANCE'), "UserId: ", user.id);
+
+      const res = await fetch(get_data_uri('SET_WALLET_BALANCE'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: user.id, asset: 'BTC', amount: balanceRef.current }),
+      });
+
+      const data = await res.json();
+
+      console.log("Setting Balance in DB: ", balanceRef.current);
+      console.log("API RESPONSE: ", data);
+      
+    } catch (err) {
+      console.error('Error syncing balance:', err);
+    }
+  };
+
+  // Sync balance periodically (every 30s)
+  useEffect(() => {
+    balanceRef.current = btcBalance;
+    console.log("Updated ref:", balanceRef.current, "btcBalance:", btcBalance);
+  }, [btcBalance]);
+
+  useEffect(() => {
+    const syncInterval = setInterval(syncBalance, 30000);
+    return () => clearInterval(syncInterval);
+  }, []);
+
+  const get_referrals = async () => {
+    try {
+      const fetch_referrals_uri = `${get_data_uri('REFERRALS')}?code=${encodeURIComponent(
+        user.referralCode
+      )}`;
+
+      console.log("Fetch Referrals URI: ", fetch_referrals_uri);
+
+      const res = await fetch(fetch_referrals_uri, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = await res.json();
+      console.log("User Referrals: ", data);
+
+      setUserReferrals(Number(data.count) || 0);
+
+    } catch (error) {
+      console.error("Error fetching referrals:", error);
+    }
+  };
+
+  useEffect(() => {
+    get_referrals();
+  }, []);
+
+  const isMiningActive =
+  hashPower > 0 && startTime && Date.now() - startTime < MAX_MINING_DURATION;
+
+  const buttonLabel = loading
+    ? "Loading..."
+    : adsWatched >= MAX_ADS
+      ? "Max Videos Reached"
+      : isMiningActive
+        ? `Increase 5 GH/s`
+        : "Start Mining";
+
   return (
     <View style={{ flex: 1 }}>
       <Sidebar visible={sidebarVisible} onClose={() => setSidebarVisible(false)}/>
 
       <ScrollView style={styles.container}>
-        <View style={styles.topBar}>
+        {/* <View style={styles.topBar}>
           
           <TouchableOpacity onPress={() => setSidebarVisible(true)}>
             <Icon name="menu" size={30} color={'#fff'} />
           </TouchableOpacity>
-
-          <View style={styles.profileContainer}>
-            <Text style={styles.username}>{user?.name}</Text>
-            <Icon name="account-circle" size={40} color={'#9333EA'} />
-          </View>
-        </View>
+        </View> */}
 
         <LinearGradient
           colors={['#1A202C', '#2D3748']}
@@ -186,50 +324,53 @@ const Page: React.FC = () => {
           end={{ x: 1, y: 0 }}
           style={styles.welcomeCard}
         >
-          <Text style={styles.welcomeText}>Welcome back, {user?.name}!</Text>
-          <Text style={styles.subText}>Your digital assets at glance.</Text>
+          <Text style={styles.welcomeText}>
+            Welcome back, {user?.name}!
+          </Text>
+          <Text style={styles.subText}>
+            Your digital assets at glance.
+          </Text>
         </LinearGradient>
 
-<<<<<<< HEAD
+        <TouchableOpacity onPress={() => navigation.navigate('BalanceHistoryScreen')}>
         <LinearGradient
           colors={['#70ecffff', '#a694b8ff']}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
           style={styles.btcBox}
         >
-          <Icon name="bitcoin" size={28} color="#fff" style={{ marginRight: 8 }} />
-          <Text style={styles.btcText}>{btcBalance.toFixed(12)} BTC</Text>
+          <LottieView
+            ref={miningAnimationRef}
+            source={miningCardAnimation}
+            loop
+            style={{ width: 60, height: 60 }}
+          />
+          <Text style={styles.btcText}>
+            {loadingBalance 
+              ? "Loading..." 
+              : btcBalance?.toFixed(12) + " BTC"}
+          </Text>
         </LinearGradient>
+      </TouchableOpacity>
 
         <View style={styles.buttonRow}>
-          <GradientButton icon="gift" onPress={() => navigation.navigate('DailyRewardsScreen')} text="Daily Rewards" />
+          <GradientButton icon="gift" onPress={() => navigation.navigate('DailyRewardsScreen')} text="Claim Free Miners" />
           <GradientButton
             icon="play-circle"
-            text={loading ? "Loading..." : adsWatched >= MAX_ADS ? "Max Videos Reached" : "Watch Video"}
+            text={buttonLabel}
             onPress={show}
             disabled={loading || adsWatched >= MAX_ADS}
           />
         </View>
-        <GradientButtonB icon="credit-card-outline" onPress={() => navigation.navigate('Store')} text="Paid Plans" fullWidth />
+        <GradientButtonB icon="credit-card-outline" onPress={() => navigation.navigate('Store')} text="Premium Miners" fullWidth />
 
         <View style={styles.cardRow}>
-          <StatCard icon="currency-usd" value="$12.50" label="Daily Profit" />
+          <StatCard icon="currency-usd" value="$0" label="Daily Profit" />
           <StatCard 
             icon="chart-line" 
-            value={`${hashPower.toLocaleString()} TH/s`} 
+            value={`${hashPower.toLocaleString()} GH/s`} 
             label="Current Hashrate" 
           />
-=======
-        <View style={styles.buttonRow}>
-          <GradientButton icon="gift" text="Daily Rewards" />
-          <GradientButton icon="play-circle" text="Watch Videos" />
-        </View>
-        <GradientButtonB icon="credit-card-outline" text="Paid Plans" fullWidth />
-
-        <View style={styles.cardRow}>
-          <StatCard icon="currency-usd" value="$12.50" label="Daily Profit" />
-          <StatCard icon="chart-line" value="200 TH/s" label="Current Hashrate" />
->>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
           <StatCard icon="speedometer" value="98%" label="Efficiency" />
         </View>
 
@@ -239,7 +380,7 @@ const Page: React.FC = () => {
           }}
           />
 
-          <InfoCard icon="account-group" value="0" label="Total Referrals" onPress={() => {
+          <InfoCard icon="account-group" value={user_referrals.toString()} label="Total Referrals" onPress={() => {
             navigation.navigate('InternalReferral');
           }}/>
         </View>
@@ -251,7 +392,8 @@ const Page: React.FC = () => {
           style={styles.portfolioBox}
         >
           <Text style={styles.sectionTitle}>Portfolio Performance</Text>
-          {/* Temporary placeholder for chart - will add back when SVG packages are fixed */}
+
+          {/* Temporary placeholder for chart */}
           <View style={styles.chart}>
             <View style={styles.chartPlaceholder}>
               <Icon name="chart-line" size={40} color="#22D3EE" />
@@ -259,6 +401,7 @@ const Page: React.FC = () => {
               <Text style={styles.chartPlaceholderSubtext}>Chart will be restored soon</Text>
             </View>
           </View>
+
           <View style={styles.filters}>
             {['1D', '1W', '1M', '1Y', 'ALL'].map((filter) => (
               <View key={filter} style={styles.filterBox}>
@@ -269,85 +412,113 @@ const Page: React.FC = () => {
         </LinearGradient>
 
         <View style={styles.cardRow}>
-          <ActionCard icon="cash-minus" label="Withdraw Funds" />
-          <ActionCard icon="cash-plus" label="Deposit Funds" />
+          <ActionCard icon="cash-minus" label="Withdraw Funds" onPress={() => {
+            navigation.navigate('WithdrawScreen');
+          }}/>
+          <ActionCard icon="cash-plus" label="Deposit Funds" onPress={() => {
+            navigation.navigate('DepositScreen');
+          }}/>
         </View>
 
         <View style={styles.recentBox}>
           <Text style={styles.sectionTitleRC}>Recent Activity</Text>
 
-          {[50.64, 850.64, 150.64, 920.64].map((value, index) => (
-            <View key={index} style={styles.transactionRow}>
-              <View>
-                <Text style={styles.transactionType}>Deposit</Text>
-                <Text style={styles.transactionCrypto}>0.001 BTC</Text>
-              </View>
-              <Text style={styles.transactionValue}>+${value.toFixed(2)}</Text>
+          {recent_activity_list.length === 0 ? (
+            <View style={{ alignItems: 'center', paddingVertical: 20 }}>
+              <LottieView
+                source={{ uri: 'https://lottie.host/7b3e44d0-5de2-4434-9731-45dcf7f12b7a/cwLLBxENUP.json' }}
+                autoPlay
+                loop
+                style={{ width: 150, height: 150 }}
+              />
+              <Text style={{ color: '#aaa', fontSize: 16, marginTop: 10 }}>
+                No transactions, deposit now
+              </Text>
             </View>
-          ))}
+          ) : (
+            <>
+              {recent_activity_list.map((activity, index) => (
+                <View key={index} style={styles.transactionRow}>
+                  <View>
+                    <Text style={styles.transactionType}>{activity.type}</Text>
+                    <Text style={styles.transactionCrypto}>{activity.crypto}</Text>
+                  </View>
+                  <Text style={styles.transactionValue}>+${activity.amount.toFixed(2)}</Text>
+                </View>
+              ))}
 
-          <GradientButtonB text="View All Activity" 
-            fullWidth 
-            onPress={() => {
-
-              navigation.navigate('AllActivity');
-
-            }}
-          />
-          
+              <GradientButtonB
+                text="View All Activity"
+                fullWidth
+                onPress={() => {
+                  navigation.navigate('AllActivity');
+                }}
+              />
+            </>
+          )}
         </View>
+
       </ScrollView>
-<<<<<<< HEAD
 
       <View style={styles.bannerContainer}>
         <BannerAd
-          unitId={HOMEBANNER_AD_UNIT_ID}
+          unitId={HOMEBANNER_AD_UNIT_ID ?? ""}
           size={BannerAdSize.FULL_BANNER}
           requestOptions={{
             requestNonPersonalizedAdsOnly: true,
           }}
         />
       </View>
-=======
->>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
     </View>
   );
 };
 
-<<<<<<< HEAD
 const GradientButton: React.FC<GradientButtonProps> = ({ icon, text, onPress, disabled = false }) => (
-=======
-const GradientButton: React.FC<GradientButtonProps> = ({ icon, text }) => (
->>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
-  <LinearGradient
-    colors={['#22D3EE', '#C084FC']}
-    start={{ x: 0, y: 0 }}
-    end={{ x: 1, y: 0 }}
-    style={[styles.gradientButton, { width: '48%' }]}
+  <TouchableOpacity
+    style={{ flex: 1, borderRadius: 40, overflow: "hidden" }}
+    activeOpacity={0.8}
+    onPress={onPress}
+    disabled={disabled}
   >
-<<<<<<< HEAD
-    <TouchableOpacity style={styles.buttonContent} activeOpacity={0.8} onPress={onPress} disabled={disabled}>
-=======
-    <TouchableOpacity style={styles.buttonContent} activeOpacity={0.8}>
->>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
-      {icon && <Icon name={icon} size={18} color="#fff" style={styles.buttonIcon} />}
+    <LinearGradient
+      colors={['#22D3EE', '#C084FC']}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 0 }}
+      style={[styles.gradientButton, { flexDirection: "row", alignItems: "center", justifyContent: "center" }]}
+    >
+      {text === "Claim Free Miners" ? (
+        <LottieView
+          source={{
+            uri: "https://lottie.host/6c2ebe48-6e55-4edb-9c0b-6fd48360beae/AyZ7cmF141.json",
+          }}
+          autoPlay
+          loop
+          style={[styles.headerAnimation, { width: 38, height: 38, marginTop: "-5%", marginRight: "-2%" }]}
+        />
+      ) : (
+        icon && <Icon name={icon} size={18} color="#fff" style={[styles.buttonIcon]} />
+      )}
       <Text style={styles.buttonText}>{text}</Text>
-    </TouchableOpacity>
-  </LinearGradient>
+    </LinearGradient>
+  </TouchableOpacity>
 );
 
 const GradientButtonB: React.FC<GradientButtonProps> = ({ icon, text, onPress }) => (
-  <LinearGradient
-    colors={['#22D3EE', '#C084FC']}
-    start={{ x: 0, y: 0 }}
-    end={{ x: 1, y: 0 }}
-    style={[styles.gradientButtonB, { width: '100%' }]}
+  <TouchableOpacity 
+    style={{ flex: 1, borderRadius: 40, overflow: "hidden" }}
+    activeOpacity={0.8}
+    onPress={onPress}
   >
-    <TouchableOpacity style={styles.buttonContent} activeOpacity={0.8}  onPress={onPress}>
+    <LinearGradient
+      colors={['#22D3EE', '#C084FC']}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 0 }}
+      style={styles.gradientButton}
+    >
       {icon && <Icon name={icon} size={18} color="#fff" style={styles.buttonIcon} />}
       <Text style={styles.buttonText}>{text}</Text>
-    </TouchableOpacity>
-  </LinearGradient>
+    </LinearGradient>
+  </TouchableOpacity>
 );
 
 const StatCard: React.FC<StatCardProps> = ({ icon, value, label, color = '#22D3EE' }) => (
@@ -371,32 +542,36 @@ const InfoCard: React.FC<InfoCardProps> = ({ icon, value, label, onPress }) => (
   </TouchableOpacity>
 );
 
-const ActionCard: React.FC<ActionCardProps> = ({ icon, label }) => (
-  <View style={styles.actionCard}>
+const ActionCard: React.FC<ActionCardProps> = ({ icon, label, onPress }) => (
+  <TouchableOpacity style={styles.actionCard} onPress={onPress} activeOpacity={0.7}>
     <Icon name={icon} size={40} color="#22D3EE" />
     <Text style={styles.actionLabel}>{label}</Text>
-  </View>
+  </TouchableOpacity>
 );
 
 export default Page;
 
 // Styles
-<<<<<<< HEAD
 const styles = StyleSheet.create({
   btcBox: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 16,
     borderRadius: 20,
     marginBottom: 20,
+    minHeight:  Platform.OS === 'ios' ? 70 : 80,
     shadowColor: '#000',
     shadowOpacity: 0.2,
+    shadowOffset: { width: 0, height: 3 },
     shadowRadius: 6,
     elevation: 3,
   },
+  headerAnimation: {
+    width: 30,
+    height: 30,
+  },
   btcText: {
-    fontSize: 28,
+    fontSize: 27,
     fontWeight: 'bold',
     color: '#fff',
     fontFamily: 'Inter',
@@ -414,24 +589,12 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: '#111827',
     marginBottom: 30
-=======
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-    backgroundColor: '#111827'
->>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
   },
   topBar: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-<<<<<<< HEAD
     paddingBottom: 30,
-=======
-    paddingBottom: 40,
->>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
     backgroundColor: '#111827'
   },
   profileContainer: {
@@ -446,21 +609,30 @@ const styles = StyleSheet.create({
   },
   welcomeCard: {
     borderRadius: 16,
-    padding: 16,
-    marginVertical: 16,
+    paddingHorizontal: Platform.OS === 'ios' ? 0 : 10,
+    paddingTop: Platform.OS === 'ios' ? 15 : 10,
     paddingBottom: 20,
-    marginBottom: 20
+    marginBottom: 20,
+    marginTop: 50,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+    elevation: 3,
+    minHeight: Platform.OS === 'ios' ? 120 : 80,
   },
   welcomeText: {
     fontSize: 25,
     color: '#fff',
     fontWeight: 'bold',
-    fontFamily: 'Inter'
+    fontFamily: 'Inter',
+    marginLeft: 20
   },
   subText: {
     color: '#e0e0e0',
     marginTop: 6,
-    fontSize: 16
+    fontSize: 16,
+    marginLeft: 20
   },
   buttonRow: {
     flexDirection: 'row',
@@ -469,16 +641,20 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   gradientButton: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
     borderRadius: 40,
-    paddingVertical: 13,
-    paddingHorizontal: 16,
-    marginBottom: 12,
+    minHeight: Platform.OS === 'ios' ? 45 : 55,
   },
+
   gradientButtonB: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
     borderRadius: 40,
-    paddingVertical: 15,
-    paddingHorizontal: 16,
     marginBottom: 12,
+    minHeight: Platform.OS === 'ios' ? 80 : 0,
   },
   buttonContent: {
     flexDirection: 'row',
@@ -491,6 +667,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#fff',
     fontWeight: '600',
+    alignSelf: "center",
   },
   cardRow: {
     flexDirection: 'row',
@@ -543,9 +720,40 @@ const styles = StyleSheet.create({
   },
   portfolioBox: {
     borderRadius: 20,
-    padding: 16,
-    marginVertical: 16,
-    height: 300,
+    paddingVertical: 20,
+    paddingHorizontal: Platform.OS === 'ios' ? 5 : 16,
+    marginBottom: Platform.OS === 'ios' ? 0 : 20,
+    minHeight: Platform.OS === 'ios' ? 290 : 220,
+
+    // Shadows for iOS/Android
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 3 },
+    shadowRadius: 6,
+    elevation: 4,
+  },
+  chart: {
+    marginVertical: 20,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  chartPlaceholder: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  chartPlaceholderText: {
+    fontSize: 16,
+    color: "#fff",
+    marginTop: 8,
+    fontWeight: "600",
+  },
+
+  chartPlaceholderSubtext: {
+    fontSize: 12,
+    color: "#A0AEC0",
+    marginTop: 4,
   },
   sectionTitle: {
     fontSize: 16,
@@ -559,30 +767,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginBottom: 12,
     color: '#fff'
-  },
-  chart: {
-    height: 180,
-  },
-  chartPlaceholder: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(34, 211, 238, 0.1)',
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: 'rgba(34, 211, 238, 0.3)',
-    borderStyle: 'dashed',
-  },
-  chartPlaceholderText: {
-    color: '#22D3EE',
-    fontSize: 16,
-    fontWeight: '600',
-    marginTop: 8,
-  },
-  chartPlaceholderSubtext: {
-    color: '#94A3B8',
-    fontSize: 12,
-    marginTop: 4,
   },
   filters: {
     flexDirection: 'row',
@@ -619,10 +803,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 16,
     marginTop: 20,
-<<<<<<< HEAD
     marginBottom: 60,
-=======
->>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
     elevation: 2,
   },
   transactionRow: {

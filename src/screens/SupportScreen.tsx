@@ -15,24 +15,28 @@ import {
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { Image } from 'react-native';
-<<<<<<< HEAD
 import { get_data_uri } from '../config/api';
 import { useAuth } from '../auth/AuthProvider';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from '../components/types';
+import { useNavigation } from '@react-navigation/native';
+import LottieView from 'lottie-react-native';
 
-const SupportScreen = ({ navigation }: any) => {
+const SupportScreen = () => {
   const { user } = useAuth();
   
   const [formData, setFormData] = useState({
     user: user?.id,
-=======
-
-const SupportScreen = ({ navigation }: any) => {
-  const [formData, setFormData] = useState({
->>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
     name: '',
     email: '',
     message: '',
   });
+
+  type LoginScreenNavigationProp = StackNavigationProp<RootStackParamList, 'SupportScreen'>;
+
+  const navigation = useNavigation<LoginScreenNavigationProp>();
+
   const [isLoading, setIsLoading] = useState(false);
 
   const handleInputChange = (field: string, value: string) => {
@@ -67,7 +71,6 @@ const SupportScreen = ({ navigation }: any) => {
 
   const handleSubmit = async () => {
     if (!validateForm()) return;
-<<<<<<< HEAD
     setIsLoading(true);
 
     try {
@@ -98,44 +101,11 @@ const SupportScreen = ({ navigation }: any) => {
             },
           },
         ]);
-=======
-
-    setIsLoading(true);
-    
-    try {
-      const response = await fetch('https://fake-mining-backend.onrender.com/api/support/contact', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        Alert.alert(
-          'Success',
-          'Your message has been sent successfully! We will get back to you soon.',
-          [
-            {
-              text: 'OK',
-              onPress: () => {
-                setFormData({ name: '', email: '', message: '' });
-                navigation.goBack();
-              },
-            },
-          ]
-        );
->>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
       } else {
         Alert.alert('Error', data.message || 'Failed to send message');
       }
     } catch (error) {
-<<<<<<< HEAD
       console.log("Error: ", error);
-=======
->>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
       Alert.alert('Error', 'Network error. Please try again later.');
     } finally {
       setIsLoading(false);
@@ -150,25 +120,19 @@ const SupportScreen = ({ navigation }: any) => {
       <StatusBar barStyle="light-content" backgroundColor="#1a1a2e" />
 
     <SafeAreaView style={styles.container}>      
-      <View style={styles.header}>
-              <Text style={styles.headerTitle}>SUPPORT</Text>
-              <View style={styles.placeholder} />
-            </View>
+      
+      <View style={styles.topBar}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Icon name="arrow-back" size={24} color="white" />
+        </TouchableOpacity>
+      </View>
+
       <KeyboardAvoidingView 
         style={styles.keyboardView}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
 
         {/* Support Icon */}
-                    <View style={styles.logoContainer}>
-                      <View style={styles.supportLogo}>
-                        <Image
-                          source={require('../assets/images/icon_support.png')}
-                          style={styles.supportImage}
-                          resizeMode="contain"
-                        />
-                      </View>
-                    </View>
 
         {/* Form */}
         <ScrollView 
@@ -176,7 +140,18 @@ const SupportScreen = ({ navigation }: any) => {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}
         >
-          <Text style={styles.sectionTitle}>Get in Touch</Text>
+
+          <View style={styles.animationView}>
+
+            <LottieView
+              source={{ uri: 'https://lottie.host/5a5c5aee-fc25-43bb-96b8-5cf145f1a3d7/GsweT8o03z.json' }}
+              autoPlay
+              loop
+              style={styles.animation}
+            />
+
+          </View>
+
           <Text style={styles.subtitle}>
             Have questions or need help? Send us a message and we'll get back to you as soon as possible.
           </Text>
@@ -225,16 +200,19 @@ const SupportScreen = ({ navigation }: any) => {
 
           {/* Submit Button */}
           <TouchableOpacity
-            style={[styles.submitButton, isLoading && styles.submitButtonDisabled]}
             onPress={handleSubmit}
             disabled={isLoading}
             activeOpacity={0.8}
+            style={{ borderRadius: 40, overflow: "hidden" }}
           >
             <LinearGradient
               colors={['#6465F1', '#A755F7']}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
-              style={styles.submitGradient}
+              style={[
+                styles.submitGradient,
+                isLoading && styles.submitButtonDisabled,
+              ]}
             >
               <Text style={styles.submitButtonText}>
                 {isLoading ? 'SENDING...' : 'SEND'}
@@ -370,28 +348,21 @@ const styles = StyleSheet.create({
     height: 120,
     paddingTop: 15,
   },
-  submitButton: {
-    marginTop: 5,
-    borderRadius: 10,
-    overflow: 'hidden',
-    height: 48,
-    width: 150,
-    alignSelf: 'center',
+  submitGradient: {
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 40,
+    minHeight: Platform.OS === 'ios' ? 45 : 55,
   },
+
+  submitButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+
   submitButtonDisabled: {
     opacity: 0.6,
-  },
-  submitGradient: {
-    paddingVertical: 15,
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '100%',
-  },
-  submitButtonText: {
-    color: '#ffffff',
-    fontSize: 13,
-    fontWeight: 'bold',
-    letterSpacing: 1,
   },
   bottomSpacing: {
     height: 50,
@@ -426,6 +397,32 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 75,
   },
+  topBar: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    padding: 16,
+    position: "relative",
+  },
+
+  topBarTitle: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    textAlign: "center",
+    color: "white",
+    fontSize: 18,
+    fontWeight: "600",
+  },
+  animationView: {
+    textAlign: "center",
+    alignItems: "center",
+    marginBottom: 30
+  },
+  animation: {
+    height: 170,
+    width: 170,
+  }
 
 });
 

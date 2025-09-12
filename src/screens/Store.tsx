@@ -1,9 +1,5 @@
 import { StackNavigationProp } from '@react-navigation/stack';
-<<<<<<< HEAD
 import React, {useState, useEffect} from 'react';
-=======
-import React from 'react';
->>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
 import {
   View,
   Text,
@@ -12,15 +8,16 @@ import {
   StyleSheet,
   StatusBar,
   Platform,
+  ActivityIndicator
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 // import Icon from 'react-native-vector-icons/Ionicons';
 import MaterialIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { RootStackParamList } from '../components/types';
 import { useNavigation } from '@react-navigation/native';
-<<<<<<< HEAD
 import { get_data_uri } from '../config/api';
 import axios from 'axios';
+import LottieView from 'lottie-react-native';
 
 interface SubscriptionItem {
   _id: string;
@@ -32,7 +29,6 @@ interface SubscriptionItem {
 }
 
 const StoreScreen = () => {
-
 
     const [SubscriptionData, setSubscriptionData] = useState<SubscriptionItem[]>([]);
     const [loading, setLoading] = useState(true);
@@ -61,41 +57,15 @@ const StoreScreen = () => {
       fetchSubscriptions();
     }, []);
 
-=======
+    if (loading) {
+      return (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#22D3EE" />
+          <Text style={styles.loadingText}>Loading store...</Text>
+        </View>
+      );
+    }
 
-const plans = [
-  {
-    id: 1,
-    name: 'Starter Miner Pack',
-    hashrate: '10 TH/s',
-    duration: '12 Months',
-    daily_maintenance: '$0.05/TH/day',
-    price: '$99.00',
-    color: '#06B6D4',
-  },
-  { 
-    id: 2,
-    name: 'Pro Miner Pack',
-    hashrate: '50 TH/s',
-    duration: '18 Months',
-    daily_maintenance: '$0.045/TH/day',
-    price: '$449.00',
-    color: '#C084FC',
-  },
-  {
-    id: 3,
-    name: 'Enterprise Miner Pack',
-    hashrate: '200 TH/s',
-    duration: '24 Months',
-    daily_maintenance: '$0.04/TH/day',
-    price: '$1599.00',
-    color: '#F472B6',
-  },
-];
-
-const StoreScreen = () => {
-
->>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
     type LoginScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Store'>;
     
     const navigation = useNavigation<LoginScreenNavigationProp>();
@@ -104,7 +74,6 @@ const StoreScreen = () => {
       navigation.navigate('MakePaymentScreen', { package_id: plan.id });
     };
 
-<<<<<<< HEAD
     const getRandomColor = (): string => {
       const colors = [
         '#FF5733',
@@ -119,8 +88,6 @@ const StoreScreen = () => {
       return colors[Math.floor(Math.random() * colors.length)];
     };
 
-=======
->>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
@@ -128,10 +95,6 @@ const StoreScreen = () => {
       {/* Top Bar */}
       <View style={styles.topBar}>
         <Text style={styles.topBarTitle}>Store</Text>
-<<<<<<< HEAD
-=======
-        <View style={{ width: 24 }} />
->>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
       </View>
 
       <ScrollView contentContainerStyle={styles.content}>
@@ -142,15 +105,29 @@ const StoreScreen = () => {
           end={{ x: 1, y: 1 }}
           style={styles.headerCard}
         >
-          <Text style={styles.headerTitle}>Purchase Hashrate</Text>
-          <Text style={styles.headerSubtitle}>
-            Grow your mining power with our{'\n'}competitive contracts.
-          </Text>
+          <View style={styles.headerContent}>
+            {/* Left Text Section */}
+            <View style={styles.textSection}>
+              <Text style={styles.headerTitle}>Purchase Hashrate</Text>
+              <Text style={styles.headerSubtitle}>
+                Grow your mining power with our{"\n"}competitive contracts.
+              </Text>
+            </View>
+
+            {/* Right Animation Section */}
+            <LottieView
+              source={{
+                uri: "https://lottie.host/d55ec37e-ebf6-4d1c-8d46-71c9ab324804/WBVEq8jUUY.json",
+              }}
+              autoPlay
+              loop
+              style={styles.headerAnimation}
+            />
+          </View>
         </LinearGradient>
 
         {/* Available Contracts */}
         <Text style={styles.sectionTitle}>Available Contracts</Text>
-<<<<<<< HEAD
         {SubscriptionData.map((plan, index) => {
           const fcolor = getRandomColor();
 
@@ -168,49 +145,24 @@ const StoreScreen = () => {
               <View style={styles.planFooter}>
                 <Text style={[styles.planPrice, { color: fcolor }]}>{`$${plan.plan_cost}.00`}</Text>
 
-                <TouchableOpacity onPress={() => handlePurchase(plan)}>
-                  <LinearGradient
-                    colors={['#22D3EE', '#C084FC']}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 0 }}
-                    style={styles.planButton}
+                <LinearGradient
+                  colors={['#22D3EE', '#C084FC']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={styles.planButton}
+                >
+                  <TouchableOpacity
+                    onPress={() => handlePurchase(plan)}
+                    activeOpacity={0.8}
                   >
                     <Text style={styles.planButtonText}>Purchase Plan</Text>
-                  </LinearGradient>
-                </TouchableOpacity>
+                  </TouchableOpacity>
+                </LinearGradient>
               </View>
             </View>
           );
         }
         )}
-=======
-        {plans.map((plan, index) => (
-        <View key={index} style={styles.planCard}>
-          <View style={styles.planHeader}>
-            <MaterialIcon name="flash" color={plan.color} size={18} style={{ marginRight: 6 }} />
-            <Text style={styles.planTitle}>{plan.name}</Text>
-          </View>
-          <Text style={styles.planSub}>Hashrate: {plan.hashrate}</Text>
-          <Text style={styles.planSub}>Duration: {plan.duration}</Text>
-          <Text style={styles.planSub}>Daily Maintenance: {plan.daily_maintenance}</Text>
-
-          <View style={styles.planFooter}>
-            <Text style={[styles.planPrice, { color: plan.color }]}>{plan.price}</Text>
-            
-            <TouchableOpacity onPress={() => handlePurchase(plan)}>
-              <LinearGradient
-                colors={['#22D3EE', '#C084FC']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={styles.planButton}
-              >
-                <Text style={styles.planButtonText}>Purchase Plan</Text>
-              </LinearGradient>
-            </TouchableOpacity>
-          </View>
-        </View>
-      ))}
->>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
 
         {/* Custom Hashrate Plan */}
         <View style={styles.customBox}>
@@ -256,16 +208,10 @@ const styles = StyleSheet.create({
   },
   topBar: {
     flexDirection: 'row',
-<<<<<<< HEAD
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 16,
     position: 'relative',
-=======
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 16,
->>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
   },
   backArrow: {
     color: 'white',
@@ -282,22 +228,49 @@ const styles = StyleSheet.create({
   },
   headerCard: {
     borderRadius: 16,
-    padding: 20,
-    alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: 20,
+    // make sure layout works across iOS/Android
+    minHeight: 120,        
+
+    // Shadows for nice card feel
+    shadowColor: "#000",
+    shadowOpacity: 0.08,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+    elevation: 2,
   },
+
+  // New for content layout
+  headerContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
+    paddingVertical: Platform.OS === "ios" ? 20 : 16,
+  },
+  textSection: {
+    flex: 1,
+    paddingRight: 10,
+  },
+
   headerTitle: {
-    color: '#FFFFFF',
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "700",
+    color: "#fff",
+    marginBottom: 8,
   },
   headerSubtitle: {
-    color: '#E2E8F0',
-    textAlign: 'center',
     fontSize: 14,
-    marginTop: 8,
+    color: "#E2E8F0",
     lineHeight: 20,
   },
+
+  // Right-side Lottie animation
+  headerAnimation: {
+    width: 100,
+    height: 100,
+  },
+
   sectionTitle: {
     color: '#FFFFFF',
     fontSize: 16,
@@ -339,11 +312,14 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 14,
     borderRadius: 8,
+    minHeight: Platform.OS === 'ios' ? 50 : 40,
+    minWidth: Platform.OS === 'ios' ? 140 : 110,
   },
   planButtonText: {
     color: 'white',
     fontWeight: '600',
     fontSize: 13,
+    paddingRight: Platform.OS === 'ios' ? 5 : 0
   },
   customBox: {
     backgroundColor: '#334155',
@@ -396,5 +372,16 @@ const styles = StyleSheet.create({
     fontSize: 13,
     marginBottom: 6,
     lineHeight: 18,
+  },
+  loadingContainer: {
+    flex: 1,
+    backgroundColor: '#111827',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  loadingText: {
+    marginTop: 12,
+    color: '#E2E8F0',
+    fontSize: 14,
   },
 });

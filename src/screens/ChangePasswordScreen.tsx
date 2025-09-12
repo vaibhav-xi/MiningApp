@@ -18,8 +18,13 @@ import LinearGradient from 'react-native-linear-gradient';
 import { API_BASE_URL } from '../config/api';
 import { Image } from 'react-native';
 import BackgroundWrapper from '../components/BackgroundWrapper';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from '../components/types';
+import LottieView from 'lottie-react-native';
 
 interface ChangePasswordScreenProps {}
+
+type ChangePasswordNavigationProp = StackNavigationProp<RootStackParamList, 'ChangePasswordScreen'>;
 
 const ChangePasswordScreen: React.FC<ChangePasswordScreenProps> = () => {
   const [password, setPassword] = useState('');
@@ -27,9 +32,10 @@ const ChangePasswordScreen: React.FC<ChangePasswordScreenProps> = () => {
   const [passwordError, setPasswordError] = useState('');
   const [confirmPasswordError, setConfirmPasswordError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const navigation = useNavigation();
   const route = useRoute();
   const { email, resetToken } = route.params as { email: string; resetToken: string };
+
+  const navigation = useNavigation<ChangePasswordNavigationProp>();
 
   const validatePassword = (password: string): boolean => {
     return password.length >= 6;
@@ -96,7 +102,10 @@ const ChangePasswordScreen: React.FC<ChangePasswordScreenProps> = () => {
         Alert.alert('Success', 'Password changed successfully! You can now login with your new password.', [
           {
             text: 'OK',
-            onPress: () => navigation.navigate('Login' as never),
+            onPress: () => navigation.reset({
+              index: 0,
+              routes: [{ name: 'Login' }],
+            }),
           },
         ]);
       } else {
@@ -119,7 +128,10 @@ const ChangePasswordScreen: React.FC<ChangePasswordScreenProps> = () => {
               Alert.alert('Success', 'Password changed successfully! You can now login with your new password.', [
                 {
                   text: 'OK',
-                  onPress: () => navigation.navigate('Login' as never),
+                  onPress: () => navigation.reset({
+                  index: 0,
+                  routes: [{ name: 'Login' }],
+                }),
                 },
               ]);
               return;
@@ -156,15 +168,16 @@ const ChangePasswordScreen: React.FC<ChangePasswordScreenProps> = () => {
           >
             <View style={styles.content}>
             {/* Logo */}
-             <View style={styles.logoContainer}>
-                          <View style={styles.bitcoinLogo}>
-                            <Image
-                              source={require('../assets/images/icon_input_box_pass_eye.png')}
-                              style={styles.bitcoinImage}
-                              resizeMode="contain"
-                            />
-                          </View>
-                        </View>
+            <View style={styles.animationView}>
+             
+              <LottieView
+                source={{ uri: 'https://lottie.host/1b56f6ce-894f-4006-9f98-738f22a79da1/9Iz9LxZLjw.json' }}
+                autoPlay
+                loop
+                style={styles.animation}
+              />
+  
+            </View>
 
             {/* Title */}
             <View style={styles.titleContainer}>
@@ -179,11 +192,7 @@ const ChangePasswordScreen: React.FC<ChangePasswordScreenProps> = () => {
                             colors={['#1B202CAA', '#2E3646AA']}
                             start={{ x: 0, y: 0 }}
                             end={{ x: 1, y: 1 }}
-<<<<<<< HEAD
                             // style={styles.formBox}
-=======
-                            style={styles.formBox}
->>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
                           >
 
             {/* Form Container */}
@@ -243,26 +252,26 @@ const ChangePasswordScreen: React.FC<ChangePasswordScreenProps> = () => {
               </View>
 
               {/* Set Password Button */}
-               <LinearGradient
-                                  colors={['#2ACFEF', '#BD85FC']}
-                                  style={styles.setPasswordButton}
-                                  start={{x: 0, y: 0}}
-                                  end={{x: 1, y: 0}}
-                                >
-                <TouchableOpacity
-                  style={styles.setPasswordButtonInner}
-                  onPress={handleChangePassword}
-                  disabled={isLoading}
+
+              <TouchableOpacity activeOpacity={0.8} onPress={handleChangePassword}>
+                <LinearGradient
+                  colors={["#22D3EE", "#C084FC"]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={styles.setPasswordButton}
                 >
-                  <Text style={styles.setPasswordButtonText}>
-                    {isLoading ? 'SETTING...' : 'SET PASSWORD'}
-                  </Text>
-                </TouchableOpacity>
-              </LinearGradient>
+                  <View style={styles.setPasswordButtonInner}>
+                    <Text style={styles.setPasswordButtonText}>{isLoading ? 'SETTING...' : 'SET PASSWORD'}</Text>
+                  </View>
+                </LinearGradient>
+              </TouchableOpacity>
 
               {/* Back to Login */}
               <View style={styles.backContainer}>
-                <TouchableOpacity onPress={() => navigation.navigate('Login' as never)}>
+                <TouchableOpacity onPress={() => navigation.reset({
+                  index: 0,
+                  routes: [{ name: 'Login' }],
+                })}>
                   <Text style={styles.backText}>Back to Login</Text>
                 </TouchableOpacity>
               </View>
@@ -271,7 +280,7 @@ const ChangePasswordScreen: React.FC<ChangePasswordScreenProps> = () => {
 
             {/* Footer */}
                         <View style={styles.footer}>
-                          <Text style={styles.footerText}>Bitcoin Mining</Text>
+                          <Text style={styles.footerText}>BitPlayPro</Text>
                         </View>
           </View>
           </ScrollView>
@@ -294,43 +303,6 @@ const styles = StyleSheet.create({
     bottom: 0,
     backgroundColor: '#1a1a2e',
   },
-  geometricShape: {
-    position: 'absolute',
-    borderWidth: 1,
-    borderColor: 'rgba(139, 69, 255, 0.3)',
-  },
-  shape1: {
-    width: 200,
-    height: 200,
-    borderRadius: 100,
-    top: -100,
-    right: -100,
-    borderColor: 'rgba(139, 69, 255, 0.2)',
-  },
-  shape2: {
-    width: 150,
-    height: 150,
-    borderRadius: 75,
-    bottom: 100,
-    left: -75,
-    borderColor: 'rgba(139, 69, 255, 0.15)',
-  },
-  shape3: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    top: 200,
-    left: 50,
-    borderColor: 'rgba(139, 69, 255, 0.1)',
-  },
-  shape4: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    bottom: 300,
-    right: 30,
-    borderColor: 'rgba(139, 69, 255, 0.2)',
-  },
   safeArea: {
     flex: 1,
   },
@@ -347,7 +319,7 @@ const styles = StyleSheet.create({
   },
   logoContainer: {
     alignItems: 'center',
-    marginTop: 50,
+    marginTop: Platform.OS === 'ios' ? 0 : 50,
   },
 
   bitcoinLogo: {
@@ -464,10 +436,19 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   inputIconImage: {
-  width: 20,
-  height: 20,
-  marginRight: 8,
-},
+    width: 20,
+    height: 20,
+    marginRight: 8,
+  },
+  animationView: {
+    textAlign: "center",
+    alignItems: "center",
+    marginBottom: 30
+  },
+  animation: {
+    height: 170,
+    width: 170,
+  }
 });
 
 export default ChangePasswordScreen;

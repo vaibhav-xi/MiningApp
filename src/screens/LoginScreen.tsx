@@ -18,8 +18,6 @@ import { useNavigation } from '@react-navigation/native';
 import LinearGradient from 'react-native-linear-gradient';
 import { apiRequest, API_ENDPOINTS } from '../config/api';
 import { testApiConnectivity, getApiInfo } from '../utils/testApi';
-import SocialLoginButtons from '../components/SocialLoginButtons';
-import { initializeGoogleSignIn } from '../services/socialAuth';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../components/types';
 import BackgroundWrapper from '../components/BackgroundWrapper';
@@ -102,15 +100,11 @@ const LoginScreen: React.FC<LoginScreenProps> = () => {
         if (data.user && data.user.emailVerified) {
           // Email verified - authenticate user and go to referral screen
           await login(data.token, data.user);
-<<<<<<< HEAD
           navigation.replace('ReferralScreen', {
                 token: data?.token,
                 user: data.user,
                 fromLogin: false
               });
-=======
-          navigation.replace('ReferralScreen');
->>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
         } else {
           // Email not verified - go to TwofactorOTP (or dashboard based on your preference)
           navigation.replace('TwofactorOTP', {
@@ -169,15 +163,11 @@ const LoginScreen: React.FC<LoginScreenProps> = () => {
           {
             text: 'Continue',
             onPress: () => {
-<<<<<<< HEAD
               navigation.replace('ReferralScreen', {
                 token: userData.user?.token,
                 user: userData.user,
                 fromLogin: false
               });
-=======
-              navigation.replace('ReferralScreen');
->>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
             },
           },
         ]
@@ -223,7 +213,7 @@ const LoginScreen: React.FC<LoginScreenProps> = () => {
 
       <SafeAreaView style={styles.safeArea}>
         <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
           style={styles.keyboardAvoidingView}
         >
           <ScrollView
@@ -237,11 +227,12 @@ const LoginScreen: React.FC<LoginScreenProps> = () => {
             <View style={styles.logoContainer}>
               <View style={styles.bitcoinLogo}>
                 <Image
-                  source={require('../assets/images/btc_icon.png')}
+                  source={require('../assets/images/main_app_icon.png')}
                   style={styles.bitcoinImage}
                   resizeMode="contain"
                 />
               </View>
+              <Text style={styles.logoTagline}>Cloud Mining Made Simple</Text>
             </View>
 
             <View style={styles.screenContainer}>
@@ -309,22 +300,23 @@ const LoginScreen: React.FC<LoginScreenProps> = () => {
                   </View>
 
                   {/* Login Button */}
-                  <LinearGradient
-                    colors={['#2ACFEF', '#BD85FC']}
-                    style={styles.loginButton}
-                    start={{x: 0, y: 0}}
-                    end={{x: 1, y: 0}}
+                  <TouchableOpacity 
+                    style={styles.loginButton} 
+                    onPress={handleLogin} 
+                    disabled={isLoading}
+                    activeOpacity={0.8}
                   >
-                    <TouchableOpacity
-                      style={styles.loginButtonInner}
-                      onPress={handleLogin}
-                      disabled={isLoading}
+                    <LinearGradient
+                      colors={['#2ACFEF', '#BD85FC']}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 0 }}
+                      style={styles.loginButtonGradient}
                     >
                       <Text style={styles.loginButtonText}>
                         {isLoading ? 'SIGNING IN...' : 'LOG IN'}
                       </Text>
-                    </TouchableOpacity>
-                  </LinearGradient>
+                    </LinearGradient>
+                  </TouchableOpacity>
 
                   {/* Sign Up Link */}
                   <TouchableOpacity style={styles.signUpContainer} onPress={handleSignUpPress}>
@@ -336,11 +328,7 @@ const LoginScreen: React.FC<LoginScreenProps> = () => {
                   {/* Forgot Password Link */}
                   <TouchableOpacity
                     style={styles.forgotPasswordContainer}
-<<<<<<< HEAD
                     onPress={() => navigation.navigate('ForgotPassword', {screen_heading: 'Forgot Password'})}
-=======
-                    onPress={() => navigation.navigate('ForgotPassword' as never)}
->>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
                   >
                     <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
                   </TouchableOpacity>
@@ -359,7 +347,7 @@ const LoginScreen: React.FC<LoginScreenProps> = () => {
 
             {/* Footer */}
             <View style={styles.footer}>
-              <Text style={styles.footerText}>Bitcoin Mining</Text>
+              <Text style={styles.footerText}>BitPlayPro</Text>
             </View>
           </View>
           </ScrollView>
@@ -380,6 +368,7 @@ const styles = StyleSheet.create({
     width: '100%',
     borderRadius: 16,
     padding: 16,
+    minHeight: Platform.OS === 'ios' ? "58%" : "45%",
   },
 
   container: {
@@ -394,43 +383,6 @@ const styles = StyleSheet.create({
     bottom: 0,
     backgroundColor: '#1a1a2e',
   },
-  geometricShape: {
-    position: 'absolute',
-    borderWidth: 1,
-    borderColor: 'rgba(139, 69, 255, 0.3)',
-  },
-  shape1: {
-    width: 200,
-    height: 200,
-    borderRadius: 100,
-    top: -100,
-    right: -100,
-    borderColor: 'rgba(139, 69, 255, 0.2)',
-  },
-  shape2: {
-    width: 150,
-    height: 150,
-    borderRadius: 75,
-    bottom: 100,
-    left: -75,
-    borderColor: 'rgba(139, 69, 255, 0.15)',
-  },
-  shape3: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    top: 200,
-    left: 50,
-    borderColor: 'rgba(139, 69, 255, 0.1)',
-  },
-  shape4: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    bottom: 300,
-    right: 30,
-    borderColor: 'rgba(139, 69, 255, 0.2)',
-  },
   safeArea: {
     flex: 1,
   },
@@ -438,29 +390,27 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    flexGrow: 1,
-    minHeight: Dimensions.get('window').height - 100,
+    flexGrow: 1, 
+    paddingHorizontal: 20, 
+    paddingVertical: 30
   },
   content: {
     flex: 1,
-    paddingHorizontal: 20,
-    justifyContent: 'center',
   },
   logoContainer: {
     alignItems: 'center',
-    marginTop: 50,
+    marginTop: '15%',
   },
 
   bitcoinLogo: {
-    width: 100,
-    height: 100,
+    width: 200,
+    height: 200,
     justifyContent: 'center',
     alignItems: 'center',
   },
   bitcoinImage: {
     width: '100%',
     height: '100%',
-    transform: [{ rotate: '3deg' }],
   },
   bitcoinSymbol: {
     fontSize: 80,
@@ -469,6 +419,7 @@ const styles = StyleSheet.create({
   },
   formContainer: {
     marginBottom: 1,
+    marginTop: 30
   },
   inputContainer: {
     marginBottom: 15,
@@ -481,8 +432,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.2)',
     paddingHorizontal: 15,
-    paddingVertical: 18,
+    paddingVertical: 10,
     height: 55,
+    width: Platform.OS === 'ios' ? '90%' : '100%'
   },
   inputIcon: {
     fontSize: 16,
@@ -507,35 +459,47 @@ const styles = StyleSheet.create({
     marginLeft: 15,
   },
   loginButton: {
-    borderRadius: 15,
-    marginTop: 20,
-    marginBottom: 20,
-    height: 45,
-    width: 160,
-    alignSelf: 'center',
+    borderRadius: 25,
+    overflow: "hidden",
+    width: Platform.OS === 'ios' ? '45%' : '50%', 
+    alignSelf: "center",
+    marginVertical: 10,
+    marginBottom: Platform.OS === 'ios' ? '10%' : "5%",
+    marginLeft: Platform.OS === 'ios' ? '-10%' : 0,
+    marginTop: 30
+  },
+
+  loginButtonGradient: {
+    height: Platform.OS === 'ios' ? 40 : 50,       
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 25,
+  },
+
+  loginButtonText: {
+    color: "#fff",
+    fontWeight: "600",
+    fontSize: 16,
   },
   loginButtonInner: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  loginButtonText: {
-    color: '#ffffff',
-    fontSize: 14,
-    fontWeight: 'bold',
-    letterSpacing: 1,
-  },
   forgotPasswordContainer: {
     alignItems: 'center',
     paddingVertical: 10,
+    marginLeft: Platform.OS === 'ios' ? '-10%' : 0
   },
   forgotPasswordText: {
     color: '#42B0FF',
     fontSize: 16,
     fontWeight: '600',
+    paddingBottom: Platform.OS === 'ios' ? '8%' : 0
   },
   signUpContainer: {
     alignItems: 'center',
+    marginLeft: Platform.OS === 'ios' ? '-10%' : 0
   },
   signUpText: {
     color: '#ffffff',
@@ -587,7 +551,7 @@ const styles = StyleSheet.create({
   footer: {
     alignItems: 'center',
     position: 'absolute',
-    bottom: 30,
+    bottom: -5,
     left: 0,
     right: 0,
   },
@@ -615,10 +579,18 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   inputIconImage: {
-  width: 20,
-  height: 20,
-  marginRight: 8,
-},
+    width: 20,
+    height: 20,
+    marginRight: 8,
+  },
+  logoTagline: {
+    fontSize: 16,
+    color: '#42B0FF',
+    fontWeight: '500',
+    textAlign: 'center',
+    lineHeight: 22,
+    letterSpacing: 0.5,
+  }
 });
 
 export default LoginScreen;

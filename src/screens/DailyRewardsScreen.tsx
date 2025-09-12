@@ -1,5 +1,5 @@
 import { StackNavigationProp } from "@react-navigation/stack";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -8,55 +8,124 @@ import {
   SafeAreaView,
   StatusBar,
   ScrollView,
+  Modal,
+  ActivityIndicator,
 } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 import { RootStackParamList } from "../components/types";
 import { useNavigation } from "@react-navigation/native";
-import Icon from 'react-native-vector-icons/Ionicons';
+import Icon from "react-native-vector-icons/Ionicons";
+import LottieView from "lottie-react-native";
+import { get_data_uri } from '../config/api';
+import { useAuth } from '../auth/AuthProvider';
+
+type NavigationProp = StackNavigationProp<
+  RootStackParamList,
+  "DailyRewardsScreen"
+>;
 
 interface Reward {
-  id: number;
-  title: string;
-  amount: string;
+  _id: string;
+  rewardType: string;
+  amount: number;
+  isRecurring: boolean;
+  day?: number | null;
   claimed: boolean;
 }
 
-type NavigationProp = StackNavigationProp<RootStackParamList, 'DailyRewardsScreen'>;
+const API_BASE = get_data_uri("GET_REWARDS");
 
 const DailyRewardsScreen = () => {
-  const [rewards, setRewards] = useState<Reward[]>([
-    { id: 1, title: "Daily Login Bonus", amount: "+10 Coins", claimed: false },
-    { id: 2, title: "Hashrate Booster", amount: "+0.000002 BTC", claimed: false },
-    { id: 3, title: "Loyalty Reward", amount: "+5 Coins", claimed: false },
-  ]);
-
-  const handleClaim = (id: number) => {
-    setRewards((prev) =>
-      prev.map((reward) =>
-        reward.id === id ? { ...reward, claimed: true } : reward
-      )
-    );
-  };
+  const [rewards, setRewards] = useState<Reward[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showPopup, setShowPopup] = useState(false);
+  const [claimedReward, setClaimedReward] = useState<Reward | null>(null);
 
   const navigation = useNavigation<NavigationProp>();
 
+  const { user } = useAuth();
+
+  const user_id = user?.id;
+
+  // Fetch rewards
+  useEffect(() => {
+    const fetchRewards = async () => {
+      try {
+        const res = await fetch(`${API_BASE}?userId=${user_id}`);
+        const data = await res.json();
+        if (data.success) {
+          setRewards(data.rewards);
+        }
+      } catch (err) {
+        console.error("Error fetching rewards", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRewards();
+  }, []);
+
+  const handleClaim = async (rewardId: string) => {
+    try {
+      const res = await fetch(`${API_BASE}/claim`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: user_id, rewardId }),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        // Update UI
+        setRewards((prev) =>
+          prev.map((r) =>
+            r._id === rewardId ? { ...r, claimed: true } : r
+          )
+        );
+
+        setClaimedReward(data.reward);
+        setShowPopup(true);
+        setTimeout(() => setShowPopup(false), 2500);
+      } else {
+        alert(data.error || "Failed to claim reward");
+      }
+    } catch (err) {
+      console.error("Error claiming reward", err);
+    }
+  };
+
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <ActivityIndicator color="white" size="large" style={{ flex: 1 }} />
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.container}>
-        <View style={styles.topBar}>
-            <TouchableOpacity onPress={() => navigation.goBack()}>
-                <Icon name="chevron-back" size={24} color="white" />
-            </TouchableOpacity>
-            <Text style={styles.topTitle}>Daily Rewards</Text>
-            <View style={{ width: 24 }} />
-        </View>
-      <StatusBar barStyle="light-content" backgroundColor="#15213B" />
-      <ScrollView contentContainerStyle={styles.scrollView}>
+      {/* Top Bar */}
+      <View style={styles.topBar}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Icon name="chevron-back" size={24} color="white" />
+        </TouchableOpacity>
+        <Text style={styles.topTitle}>Daily Rewards</Text>
+        <View style={{ width: 24 }} />
+      </View>
 
+      <StatusBar barStyle="light-content" backgroundColor="#15213B" />
+
+      <ScrollView contentContainerStyle={styles.scrollView}>
         {rewards.map((reward) => (
-          <View key={reward.id} style={styles.rewardCard}>
+          <View key={reward._id} style={styles.rewardCard}>
             <View style={styles.rewardInfo}>
-              <Text style={styles.rewardTitle}>{reward.title}</Text>
-              <Text style={styles.rewardAmount}>{reward.amount}</Text>
+              <Text style={styles.rewardTitle}>
+                {reward.rewardType}
+              </Text>
+              <Text style={styles.rewardAmount}>
+                + {reward.amount} GH/s
+              </Text>
             </View>
 
             {reward.claimed ? (
@@ -72,7 +141,7 @@ const DailyRewardsScreen = () => {
               >
                 <TouchableOpacity
                   style={styles.claimTouchable}
-                  onPress={() => handleClaim(reward.id)}
+                  onPress={() => handleClaim(reward._id)}
                 >
                   <Text style={styles.claimText}>Claim</Text>
                 </TouchableOpacity>
@@ -81,6 +150,27 @@ const DailyRewardsScreen = () => {
           </View>
         ))}
       </ScrollView>
+
+      {/* Claim Popup with Lottie */}
+      <Modal transparent visible={showPopup} animationType="fade">
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalBox}>
+            <LottieView
+              source={{
+                uri: "https://lottie.host/6c2ebe48-6e55-4edb-9c0b-6fd48360beae/AyZ7cmF141.json",
+              }}
+              autoPlay
+              loop={false}
+              style={{ width: 250, height: 250 }}
+            />
+            <Text style={styles.modalText}>
+              {claimedReward
+                ? `${claimedReward.rewardType} Claimed!`
+                : "Reward Claimed!"}
+            </Text>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -93,26 +183,19 @@ const styles = StyleSheet.create({
     backgroundColor: "#15213B",
   },
   topBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     padding: 16,
   },
   topTitle: {
-    color: 'white',
+    color: "white",
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   scrollView: {
     padding: 16,
     paddingTop: 60,
-  },
-  header: {
-    color: "#FFFFFF",
-    fontSize: 24,
-    fontWeight: "700",
-    marginBottom: 24,
-    textAlign: "center",
   },
   rewardCard: {
     backgroundColor: "rgba(240, 255, 255, 0.08)",
@@ -162,5 +245,23 @@ const styles = StyleSheet.create({
     color: "#9CA3AF",
     fontWeight: "600",
     fontSize: 14,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.6)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalBox: {
+    backgroundColor: "#1E293B",
+    padding: 20,
+    borderRadius: 16,
+    alignItems: "center",
+  },
+  modalText: {
+    marginTop: 12,
+    color: "white",
+    fontSize: 16,
+    fontWeight: "600",
   },
 });

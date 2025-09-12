@@ -8,7 +8,6 @@
 #   http://developer.android.com/guide/developing/tools/proguard.html
 
 # Add any project specific keep options here:
-<<<<<<< HEAD
 
 # Google Mobile Ads SDK
 -keep public class com.google.android.gms.ads.** {
@@ -18,5 +17,3 @@
     public *;
 }
 -dontwarn com.google.android.gms.ads.**
-=======
->>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042

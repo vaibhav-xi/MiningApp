@@ -1,9 +1,5 @@
-<<<<<<< HEAD
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-=======
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
->>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -34,14 +30,11 @@
       <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
       <meta-data android:name="com.facebook.sdk.ClientToken" android:value="@string/facebook_client_token"/>
 
-<<<<<<< HEAD
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-9138199693214957~9953363636"
             tools:replace="android:value"/>
 
-=======
->>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
       <!-- Facebook Login Activity -->
       <activity android:name="com.facebook.FacebookActivity"
           android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"

@@ -92,6 +92,10 @@ const ReferralScreen: React.FC<ReferralScreenProps> = () => {
                 console.error('Missing token or user data');
                 Alert.alert('Error', 'Missing authentication data. Please login again.');
                 navigation.navigate('Login');
+                navigation.reset({
+                  index: 0,
+                  routes: [{ name: 'Login' }],
+                });
                 return;
             }
 
@@ -99,18 +103,11 @@ const ReferralScreen: React.FC<ReferralScreenProps> = () => {
                 // If coming from login email verification, authenticate and go to dashboard
                 console.log('Authenticating from login flow');
                 await login(token, user);
-<<<<<<< HEAD
                 navigation.replace('Main');
             } else {
                 // If coming from signup, just authenticate and go to dashboard
                 await login(token, user);
                 navigation.replace('Main');
-=======
-            } else {
-                // If coming from signup, just authenticate and go to dashboard
-                console.log('Authenticating from signup flow');
-                await login(token, user);
->>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
             }
             // After authentication, navigation will be handled by AuthProvider
             // User will automatically be redirected to Main screen
@@ -174,92 +171,98 @@ const ReferralScreen: React.FC<ReferralScreenProps> = () => {
 
                 {/* Referral Code Box */}
                 <Text style={styles.referralTitle}>REFERRAL CODE</Text>
-                <TouchableOpacity onPress={copyReferralCode}>
-                    <LinearGradient
-                        colors={['#1B202CAA', '#2E3646AA']}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 1 }}
-                        style={styles.referralBox}
-                    >
-                        <Text style={styles.referralCode}>{userReferralCode}</Text>
-                        <View style={styles.underline} />
-                        <Text style={styles.tapToCopy}>Tap to copy</Text>
-                    </LinearGradient>
+                
+                <TouchableOpacity onPress={copyReferralCode} activeOpacity={0.8} style={{ borderRadius: 15, overflow: "hidden" }}>
+                  <LinearGradient
+                    colors={['#1B202CAA', '#2E3646AA']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={styles.referralBox}
+                  >
+                    <Text style={styles.referralCode}>{userReferralCode}</Text>
+                    <View style={styles.underline} />
+                    <Text style={styles.tapToCopy}>Tap to copy</Text>
+                  </LinearGradient>
                 </TouchableOpacity>
 
                 {/* Invite Section */}
-                <LinearGradient
-                    colors={['#1B202CAA', '#2E3646AA']}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 1 }}
-                    style={styles.formBox}
+                <TouchableOpacity
+                  style={{ borderRadius: 15, overflow: "hidden", alignSelf: "center" }}
+                  onPress={handleInvite}
+                  disabled={isLoading}
+                  activeOpacity={0.8}
                 >
-                    <View style={styles.formContainer}>
-                    <Text style={styles.earnText}>
-                        Earn up to 50$ for each referral that uses the app for more than 5 days.{' '}
-                        <Text style={styles.learnMore}>Learn more</Text>
-                    </Text>
-
-                    <LinearGradient
-                        colors={['#2ACFEF', '#BD85FC']}
-                        style={styles.loginButton}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 0 }}
-                    >
-                        <TouchableOpacity
-                        style={styles.loginButtonInner}
-                        onPress={handleInvite}
-                        disabled={isLoading}
-                        >
-                        <Text style={styles.loginButtonText}>
-                            {isLoading ? 'Loading...' : 'INVITE'}
-                        </Text>
-                        </TouchableOpacity>
-                    </LinearGradient>
+                  <LinearGradient
+                    colors={['#2ACFEF', '#BD85FC']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={styles.loginButton}
+                  >
+                    <View style={styles.loginButtonInner}>
+                      <Text style={styles.loginButtonText}>
+                        {isLoading ? 'Loading...' : 'INVITE'}
+                      </Text>
                     </View>
-                </LinearGradient>
+                  </LinearGradient>
+                </TouchableOpacity>
 
                 {/* Share From Section */}
                 <LinearGradient
-                    colors={['#1B202CAA', '#2E3646AA']}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 1 }}
-                    style={styles.shareBox}
+                  colors={['#1B202CAA', '#2E3646AA']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.shareBox}
                 >
-                    <Text style={styles.shareTitle}>Share from</Text>
-                    <View style={styles.iconRow}>
+                  <Text style={styles.shareTitle}>Share with friends</Text>
+                  <Text style={styles.shareSubtitle}>
+                    Invite others using your referral code
+                  </Text>
+
+                  <View style={styles.iconRow}>
                     <TouchableOpacity
-                    onPress={() => Linking.openURL(`whatsapp://send?text=Join me using my referral code: ${userReferralCode}`)}
+                      style={styles.iconButton}
+                      onPress={() =>
+                        Linking.openURL(`whatsapp://send?text=Join me using my referral code: ${userReferralCode}`)
+                      }
                     >
-                        <Image source={require('../assets/images/icon_wa.png')} style={styles.shareIcon} />
+                      <Image source={require('../assets/images/icon_wa.png')} style={styles.shareIcon} />
                     </TouchableOpacity>
 
                     <TouchableOpacity
-                    onPress={() => Linking.openURL(`sms:?body=Join me using my referral code: ${userReferralCode}`)}
+                      style={styles.iconButton}
+                      onPress={() =>
+                        Linking.openURL(`sms:?body=Join me using my referral code: ${userReferralCode}`)
+                      }
                     >
-                        <Image source={require('../assets/images/icon_sms.png')} style={styles.shareIcon} />
+                      <Image source={require('../assets/images/icon_sms.png')} style={styles.shareIcon} />
                     </TouchableOpacity>
 
                     <TouchableOpacity
-                    onPress={() => Linking.openURL(`tg://msg?text=Join me using my referral code: ${userReferralCode}`)}
+                      style={styles.iconButton}
+                      onPress={() =>
+                        Linking.openURL(`tg://msg?text=Join me using my referral code: ${userReferralCode}`)
+                      }
                     >
-                        <Image source={require('../assets/images/icon_tel.png')} style={styles.shareIcon} />
+                      <Image source={require('../assets/images/icon_tel.png')} style={styles.shareIcon} />
                     </TouchableOpacity>
-                    
-                    </View>
+                  </View>
                 </LinearGradient>
 
                 {/* Skip Button */}
-                <LinearGradient
+                <TouchableOpacity
+                  onPress={handleSkip}
+                  activeOpacity={0.8}
+                  style={{ borderRadius: 30, alignSelf: "center" }}
+                >
+                  <LinearGradient
                     colors={['#2ACFEF', '#BD85FC']}
-                    style={styles.skipButton}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 0 }}
-                >
-                    <TouchableOpacity onPress={handleSkip}>
+                    style={styles.skipButton}
+                  >
                     <Text style={styles.skipButtonText}>SKIP FOR NOW</Text>
-                    </TouchableOpacity>
-                </LinearGradient>
+                  </LinearGradient>
+                </TouchableOpacity>
 
                 </View>
 
@@ -276,61 +279,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center'
   },
-
   formBox: {
     width: '100%',
     borderRadius: 16,
     padding: 16,
   },
-
   container: {
     flex: 1,
     backgroundColor: '#1a1a2e',
-  },
-  backgroundPattern: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: '#1a1a2e',
-  },
-  geometricShape: {
-    position: 'absolute',
-    borderWidth: 1,
-    borderColor: 'rgba(139, 69, 255, 0.3)',
-  },
-  shape1: {
-    width: 200,
-    height: 200,
-    borderRadius: 100,
-    top: -100,
-    right: -100,
-    borderColor: 'rgba(139, 69, 255, 0.2)',
-  },
-  shape2: {
-    width: 150,
-    height: 150,
-    borderRadius: 75,
-    bottom: 100,
-    left: -75,
-    borderColor: 'rgba(139, 69, 255, 0.15)',
-  },
-  shape3: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    top: 200,
-    left: 50,
-    borderColor: 'rgba(139, 69, 255, 0.1)',
-  },
-  shape4: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    bottom: 300,
-    right: 30,
-    borderColor: 'rgba(139, 69, 255, 0.2)',
   },
   safeArea: {
     flex: 1,
@@ -345,9 +301,7 @@ const styles = StyleSheet.create({
   },
   logoContainer: {
     alignItems: 'center',
-    marginTop: 50,
   },
-
   bitcoinLogo: {
     width: 100,
     height: 100,
@@ -359,49 +313,8 @@ const styles = StyleSheet.create({
     height: '100%',
     transform: [{ rotate: '3deg' }],
   },
-  bitcoinSymbol: {
-    fontSize: 80,
-    color: '#8b45ff',
-    fontWeight: 'bold',
-  },
   formContainer: {
     marginBottom: 1,
-  },
-  inputContainer: {
-    marginBottom: 15,
-  },
-  inputWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.08)',
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
-    paddingHorizontal: 15,
-    paddingVertical: 18,
-    height: 55,
-  },
-  inputIcon: {
-    fontSize: 16,
-    marginRight: 12,
-    color: '#8a8a8a',
-  },
-  input: {
-    flex: 1,
-    fontSize: 16,
-    color: '#ffffff',
-    fontWeight: '500',
-    letterSpacing: 0.5,
-    textAlignVertical: 'center',
-    includeFontPadding: false,
-    paddingVertical: 0,
-    margin: 0,
-  },
-  errorText: {
-    color: '#ff6b6b',
-    fontSize: 12,
-    marginTop: 5,
-    marginLeft: 15,
   },
   loginButton: {
     borderRadius: 15,
@@ -409,7 +322,9 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     height: 45,
     width: 160,
-    alignSelf: 'center',
+    alignSelf: "center",
+    justifyContent: "center",
+    alignItems: "center",
   },
   loginButtonInner: {
     flex: 1,
@@ -422,100 +337,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     letterSpacing: 1,
   },
-  forgotPasswordContainer: {
-    alignItems: 'center',
-    paddingVertical: 10,
-  },
-  forgotPasswordText: {
-    color: '#42B0FF',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  signUpContainer: {
-    alignItems: 'center',
-  },
-  signUpText: {
-    color: '#ffffff',
-    fontSize: 14,
-    fontWeight: '400',
-  },
-  signUpLink: {
-    color: '#42B0FF',
-    fontWeight: '600',
-  },
-  socialContainer: {
-    alignItems: 'center'
-  },
-  socialText: {
-    color: '#ffffff',
-    fontSize: 12,
-    marginBottom: 20,
-    letterSpacing: 1.5,
-    fontWeight: '500',
-  },
-  socialButtons: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-  },
-  socialButton: {
-    width: 45,
-    height: 45,
-    borderRadius: 22.5,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginHorizontal: 8,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
-  },
-  facebookButton: {
-    backgroundColor: '#3b5998',
-  },
-  googleButton: {
-    backgroundColor: '#dd4b39',
-  },
-  linkedinButton: {
-    backgroundColor: '#0077b5',
-  },
-  socialIcon: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  footer: {
-    alignItems: 'center',
-    position: 'absolute',
-    bottom: 30,
-    left: 0,
-    right: 0,
-  },
-  footerText: {
-    color: '#ffffff',
-    fontSize: 13,
-    fontWeight: '400',
-  },
-  testApiButton: {
-    backgroundColor: '#333',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-    marginTop: 20,
-    alignSelf: 'center',
-  },
-  testApiText: {
-    color: '#fff',
-    fontSize: 12,
-    textAlign: 'center',
-  },
   backgroundImage: {
     flex: 1,
     width: '100%',
     height: '100%',
   },
-  inputIconImage: {
-  width: 20,
-  height: 20,
-  marginRight: 8,
-},
 referralTitle: {
   color: '#4ACDFC',
   fontSize: 14,
@@ -524,12 +350,12 @@ referralTitle: {
 },
 
 referralBox: {
-  paddingVertical: 10,
-  paddingHorizontal: 20,
-  alignItems: 'center',
+  alignItems: "center",
+  justifyContent: "center",
   marginBottom: 20,
-  alignSelf: 'center',
   borderRadius: 15,
+  minHeight: 100,
+  minWidth: 200
 },
 
 referralCode: {
@@ -565,39 +391,13 @@ learnMore: {
   textDecorationLine: 'underline',
 },
 
-shareBox: {
-  width: '85%',
-  alignSelf: 'center',
-  padding: 15,
-  marginVertical: 25,
-  borderRadius: 12,
-},
-
-shareTitle: {
-  color: '#fff',
-  fontSize: 12,
-  marginBottom: 10,
-},
-
-iconRow: {
-  flexDirection: 'row',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  marginTop: 10,
-},
-
-shareIcon: {
-  width: 40,
-  height: 40,
-  resizeMode: 'contain',
-},
-
 skipButton: {
-  alignSelf: 'center',
-  paddingHorizontal: 25,
-  paddingVertical: 8,
-  borderRadius: 30,
+  borderRadius: 70,
   marginTop: 20,
+  justifyContent: "center",
+  alignItems: "center",
+  minHeight: Platform.OS === 'ios' ? 40 : 45,
+  width: 150
 },
 
 skipButtonText: {
@@ -605,6 +405,55 @@ skipButtonText: {
   fontWeight: 'bold',
   fontSize: 14,
 },
+
+shareBox: {
+    width: '90%',
+    alignSelf: 'center',
+    marginVertical: 25,
+    borderRadius: 16,
+    paddingVertical: Platform.OS === 'ios' ? 0 : 20,
+    minHeight: Platform.OS === 'ios' ? 150 : 130,
+    justifyContent: 'center',
+  },
+
+  shareTitle: {
+    color: '#4ACDFC',
+    fontSize: 14,
+    fontWeight: '600',
+    textAlign: 'center',
+    marginBottom: 6,
+  },
+
+  shareSubtitle: {
+    color: '#FFFFFFAA',
+    fontSize: 12,
+    textAlign: 'center',
+    marginBottom: 18,
+  },
+
+  iconRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 10,
+  },
+
+  iconButton: {
+    width: 55,
+    height: 55,
+    borderRadius: 28,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginHorizontal: 10,
+    overflow: 'hidden', 
+  },
+
+  shareIcon: {
+    width: 28,
+    height: 28,
+    resizeMode: 'contain',
+  },
 });
 
 export default ReferralScreen;

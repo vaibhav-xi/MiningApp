@@ -1,9 +1,5 @@
 import { StackNavigationProp } from '@react-navigation/stack';
-<<<<<<< HEAD
 import React, { useEffect, useState, useCallback } from 'react';
-=======
-import React from 'react';
->>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
 import {
   View,
   Text,
@@ -12,131 +8,144 @@ import {
   TouchableOpacity,
   StatusBar,
   SafeAreaView,
-<<<<<<< HEAD
   RefreshControl,
-=======
->>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { RootStackParamList } from '../components/types';
 import { useNavigation } from '@react-navigation/native';
-<<<<<<< HEAD
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import LottieView from 'lottie-react-native';
+import noTxAnimation from '../assets/animations/no-data.json';
+import { useAuth } from '../auth/AuthProvider';
+import { get_data_uri } from '../config/api';
 
 interface Transaction {
   type: string;
   method: string;
   date: string;
-  amount: string;
+  amountNumeric?: { $numberDecimal: string };
   isPositive: boolean;
 }
 
-const BTC_TO_USD = 120000;
+async function getBTCPrice() {
+  try {
+    const res = await axios.get(
+      "https://api.coingecko.com/api/v3/simple/price",
+      { params: { ids: "bitcoin", vs_currencies: "usd" } }
+    );
+    return res.data.bitcoin.usd;
+  } catch (err) {
+    console.error("Error fetching BTC price:", err.message);
+    return 0;
+  }
+}
 
 const WalletScreen = () => {
+  const { user } = useAuth();
   const [btcBalance, setBtcBalance] = useState(0);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [showUSD, setShowUSD] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [displayedBalance, setDisplayedBalance] = useState<string>('Loading...');
+  const [balanceLoading, setBalanceLoading] = useState(false);
 
   type WalletNav = StackNavigationProp<RootStackParamList, 'Wallet'>;
   const navigation = useNavigation<WalletNav>();
 
-  const loadData = useCallback(async () => {
+  // Fetch BTC balance from server
+  const fetchBalance = useCallback(async () => {
     try {
-      const storedBtc = await AsyncStorage.getItem("btcBalance");
-      if (storedBtc) {
-        setBtcBalance(parseFloat(storedBtc));
+      if (!user?.id) {
+        navigation.reset({
+          index: 0,
+          routes: [{ name: "Login" }],
+        });
+        return;
       }
 
-      const storedTxns = await AsyncStorage.getItem("transactions");
-      if (storedTxns) {
-        setTransactions(JSON.parse(storedTxns));
+      const res = await fetch(
+        `${get_data_uri("GET_WALLET_BALANCE")}?userId=${user.id}`
+      );
+      const data = await res.json();
+
+      if (res.ok && data.balance) {
+        const btcVal = parseFloat(
+          data.balance.BTC?.$numberDecimal ?? data.balance.BTC ?? "0"
+        );
+        setBtcBalance(btcVal);
       }
-    } catch (e) {
-      console.error("Error loading wallet data", e);
+    } catch (err) {
+      console.error("Error fetching BTC balance:", err);
     }
-  }, []);
+  }, [user?.id, navigation]);
+
+  // Fetch user transactions from server
+  const fetchTransactions = useCallback(async () => {
+    try {
+      const res = await fetch(`${get_data_uri('CREATE_WITHDRAWAL')}/user/${user.id}`);
+      const data = await res.json();
+
+      console.log("API RESPONSE: ", data);
+
+      if (res.ok && Array.isArray(data)) {
+        const txns: Transaction[] = data.map((txn: any) => ({
+          type: txn.asset,
+          method: txn.chain,
+          date: txn.created_at,
+          amountNumeric: txn.amountNumeric,
+          isPositive: parseFloat(txn.amountNumeric?.$numberDecimal ?? '0') >= 0,
+        }));
+        setTransactions(txns);
+      } else {
+        setTransactions([]);
+      }
+    } catch (err) {
+      console.error("Error fetching transactions:", err);
+      setTransactions([]);
+    }
+  }, [user.id]);
+
+  const loadData = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await fetchBalance();
+      await fetchTransactions();
+    } catch (err) {
+      console.error("Error loading wallet data", err);
+    } finally {
+      setRefreshing(false);
+    }
+  }, [fetchBalance, fetchTransactions]);
 
   useEffect(() => {
     loadData();
   }, [loadData]);
 
+  useEffect(() => {
+    async function updateBalance() {
+      if (showUSD) {
+        setBalanceLoading(true);
+        const price = await getBTCPrice();
+        setDisplayedBalance(`$${btcBalance * price}`);
+        setBalanceLoading(false);
+      } else {
+        setDisplayedBalance(`${btcBalance.toFixed(12)} BTC`);
+      }
+    }
+    updateBalance();
+  }, [btcBalance, showUSD]);
+
   const onRefresh = async () => {
-    setRefreshing(true);
     await loadData();
-    setRefreshing(false);
   };
 
   const handleDeposit = () => navigation.navigate('DepositScreen');
   const handleWithdraw = () => navigation.navigate('WithdrawScreen');
   const handleViewAll = () => console.log('View All Transactions');
 
-  const displayedValue = showUSD
-    ? `$${((btcBalance / 4) * BTC_TO_USD).toFixed(4)}`
-    : `${(btcBalance / 4).toFixed(12)} BTC`;
-=======
-
-const transactions = [
-  {
-    type: 'Deposit',
-    method: 'Bank Transfer',
-    date: '2025-07-06 14:32',
-    amount: '+$500.00',
-    isPositive: true,
-  },
-  {
-    type: 'Subscription Fee',
-    method: 'Card Payment',
-    date: '2025-07-05 10:12',
-    amount: '-$29.99',
-    isPositive: false,
-  },
-  {
-    type: 'Sent Payment',
-    method: 'Crypto (BTC)',
-    date: '2025-07-04 18:00',
-    amount: '-$100.00',
-    isPositive: false,
-  },
-  {
-    type: 'Deposit',
-    method: 'Bank Transfer',
-    date: '2025-07-06 14:32',
-    amount: '+$1500.00',
-    isPositive: true,
-  },
-  {
-    type: 'Deposit',
-    method: 'Bank Transfer',
-    date: '2025-07-06 14:32',
-    amount: '+$300.00',
-    isPositive: true,
-  },
-];
-
-const WalletScreen = () => {
-  const handleDeposit = () => {
-    navigation.navigate('DepositScreen');
-  };
-
-  const handleWithdraw = () => {
-    navigation.navigate('WithdrawScreen');
-  };
-
-  const handleViewAll = () => {
-    console.log('View All Transactions');
-  };
-
-    type LoginScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Wallet'>;
-  
-    const navigation = useNavigation<LoginScreenNavigationProp>();
->>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
-
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#15213B" />
-<<<<<<< HEAD
       <ScrollView
         contentContainerStyle={styles.scrollView}
         refreshControl={
@@ -150,26 +159,25 @@ const WalletScreen = () => {
         {/* Balance Box */}
         <View style={styles.balanceBox}>
           <Text style={styles.balanceLabel}>Your Current Balance</Text>
-          <Text style={styles.balanceAmount}>{displayedValue}</Text>
+          <Text
+            style={styles.balanceAmount}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.6}
+          >
+            {displayedBalance}
+          </Text>
           <Text style={styles.balanceChange}>Mining earnings</Text>
 
           <TouchableOpacity
             style={styles.convertButton}
             onPress={() => setShowUSD(!showUSD)}
+            disabled={balanceLoading}
           >
             <Text style={styles.convertText}>
-              {showUSD ? "Show in BTC" : "Convert to USD"}
+              {balanceLoading ? "Loading..." : showUSD ? "Show in BTC" : "Convert to USD"}
             </Text>
           </TouchableOpacity>
-=======
-      <ScrollView contentContainerStyle={styles.scrollView}>
-
-        {/* Balance Box */}
-        <View style={styles.balanceBox}>
-          <Text style={styles.balanceLabel}>Your Current Balance</Text>
-          <Text style={styles.balanceAmount}>$12,345.67</Text>
-          <Text style={styles.balanceChange}>+2.5% today</Text>
->>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
         </View>
 
         {/* Buttons */}
@@ -200,11 +208,15 @@ const WalletScreen = () => {
         {/* Transaction History */}
         <View style={styles.transactionContainer}>
           <Text style={styles.transactionHeader}>Transaction History</Text>
-<<<<<<< HEAD
 
           {transactions.length === 0 ? (
             <View style={styles.emptyBox}>
-              <Text style={styles.emptyText}>No transactions yet</Text>
+              <LottieView
+                source={noTxAnimation}
+                autoPlay
+                loop
+                style={{ width: 200, height: 200 }}
+              />
             </View>
           ) : (
             <>
@@ -227,7 +239,7 @@ const WalletScreen = () => {
                       { color: txn.isPositive ? '#10B981' : '#EF4444' },
                     ]}
                   >
-                    {txn.amount}
+                    {txn["amountNumeric"]?.$numberDecimal ?? '0'}
                   </Text>
                 </View>
               ))}
@@ -238,37 +250,6 @@ const WalletScreen = () => {
             </>
           )}
         </View>
-=======
-          {transactions.map((txn, index) => (
-                <View
-                key={index}
-                style={[
-                    styles.transactionRow,
-                    index !== 0 && styles.transactionRowBorderTop, // Add border if not the first
-                ]}
-                >
-                <View>
-                    <Text style={styles.transactionType}>{txn.type}</Text>
-                    <Text style={styles.transactionMethod}>Method: {txn.method}</Text>
-                    <Text style={styles.transactionDate}>{txn.date}</Text>
-                </View>
-                <Text
-                    style={[
-                    styles.transactionAmount,
-                    { color: txn.isPositive ? '#10B981' : '#EF4444' },
-                    ]}
-                >
-                    {txn.amount}
-                </Text>
-                </View>
-            ))}
-
-          <TouchableOpacity style={styles.viewAllButton} onPress={handleViewAll}>
-            <Text style={styles.viewAllText}>View All Transactions</Text>
-          </TouchableOpacity>
-        </View>
-
->>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
       </ScrollView>
     </SafeAreaView>
   );
@@ -276,6 +257,7 @@ const WalletScreen = () => {
 
 export default WalletScreen;
 
+// Styles remain unchanged
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -286,11 +268,7 @@ const styles = StyleSheet.create({
     paddingTop: 60
   },
   balanceBox: {
-<<<<<<< HEAD
     backgroundColor: 'rgba(240, 255, 255, 0.17)',
-=======
-    backgroundColor: 'rgba(240, 255, 255, 0.17)', // azure with opacity
->>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
     borderRadius: 16,
     padding: 24,
     alignItems: 'center',
@@ -303,17 +281,13 @@ const styles = StyleSheet.create({
   },
   balanceAmount: {
     color: '#FFFFFF',
-<<<<<<< HEAD
     fontSize: 28,
-=======
-    fontSize: 36,
->>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
     fontWeight: 'bold',
+    textAlign: 'center',
   },
   balanceChange: {
     color: '#34D399',
     fontSize: 14,
-<<<<<<< HEAD
     marginTop: 10,
   },
   convertButton: {
@@ -327,9 +301,6 @@ const styles = StyleSheet.create({
     color: '#F9FAFB',
     fontSize: 14,
     fontWeight: '500',
-=======
-    marginTop: 4,
->>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
   },
   buttonRow: {
     flexDirection: 'row',
@@ -402,7 +373,6 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   transactionRowBorderTop: {
-<<<<<<< HEAD
     borderTopWidth: 1,
     borderTopColor: '#334155',
     paddingTop: 16,
@@ -418,11 +388,4 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontStyle: 'italic',
   },
-=======
-  borderTopWidth: 1,
-  borderTopColor: '#334155',
-  paddingTop: 16,
-  marginTop: 16,
-},
->>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
 });

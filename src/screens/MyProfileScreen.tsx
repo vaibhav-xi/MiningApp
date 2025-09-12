@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  Platform,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -52,14 +53,20 @@ const MyProfileScreen = () => {
         <TouchableOpacity
           style={styles.row}
           onPress={() => {
-<<<<<<< HEAD
+            navigation.navigate('AchievementsScreen');
+          }}
+        >
+          <View style={styles.rowLine} />
+          <Text style={styles.rowText}>Achievements</Text>
+          <Icon name="chevron-forward" size={20} color="#fff" />
+        </TouchableOpacity>
+        
+        <TouchableOpacity
+          style={styles.row}
+          onPress={() => {
             navigation.navigate('ForgotPassword', {
               screen_heading: 'Change Password'
             });
-=======
-            // TODO: Implement ChangePassword screen
-            console.log('Change Password clicked');
->>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
           }}
         >
           <View style={styles.rowLine} />
@@ -82,12 +89,7 @@ const MyProfileScreen = () => {
         <TouchableOpacity
           style={styles.row}
           onPress={() => {
-<<<<<<< HEAD
             navigation.navigate('TwoFactorScreen');
-=======
-            // TODO: Implement TwoFactorScreen
-            console.log('Two Factor Authentication clicked');
->>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
           }}
         >
           <View style={styles.rowLine} />
@@ -98,12 +100,7 @@ const MyProfileScreen = () => {
         <TouchableOpacity
           style={styles.row}
           onPress={() => {
-<<<<<<< HEAD
             navigation.navigate('NotificationPreferencesScreen');
-=======
-            // TODO: Implement NotificationPrefs screen
-            console.log('Notification Preferences clicked');
->>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
           }}
         >
           <View style={styles.rowLine} />
@@ -148,21 +145,36 @@ const MyProfileScreen = () => {
           <Icon name="chevron-forward" size={20} color="#fff" />
         </TouchableOpacity>
 
+        <TouchableOpacity
+          style={styles.row}
+          onPress={() => {
+            navigation.navigate('DeleteAccount' as any);
+          }}
+        >
+          <View style={styles.rowLine} />
+          <Text style={styles.rowText}>Delete Account</Text>
+          <Icon name="chevron-forward" size={20} color="#fff" />
+        </TouchableOpacity>
+
       </View>
 
       {/* Logout Button */}
-      <LinearGradient
-        colors={['#53D3F6', '#BD85FC', '#F472B6']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 0 }}
-        style={styles.logoutButton}
-      >
-        <TouchableOpacity onPress={ async () => {
+      <TouchableOpacity
+        onPress={async () => {
           await logout();
-        }}>
+        }}
+        activeOpacity={0.8}
+        style={{ borderRadius: 40, overflow: "hidden" }}
+      >
+        <LinearGradient
+          colors={['#53D3F6', '#BD85FC', '#F472B6']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={styles.logoutButton}
+        >
           <Text style={styles.logoutText}>Logout</Text>
-        </TouchableOpacity>
-      </LinearGradient>
+        </LinearGradient>
+      </TouchableOpacity>
     </ScrollView>
   );
 };
@@ -172,6 +184,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#111827',
     flex: 1,
     paddingHorizontal: 16,
+    paddingTop: Platform.OS === 'ios' ? 50 : 0
   },
   topBar: {
     paddingVertical: 20,
@@ -249,15 +262,16 @@ const styles = StyleSheet.create({
     marginLeft: 4,
   },
   logoutButton: {
-    borderRadius: 999,
-    paddingVertical: 14,
-    alignItems: 'center',
-    marginBottom: 40,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 40,
+    minHeight: 50,
   },
+
   logoutText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
 });
 

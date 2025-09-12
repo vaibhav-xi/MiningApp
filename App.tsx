@@ -5,11 +5,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { StatusBar, useColorScheme } from 'react-native';
 
 import { AuthProvider, useAuth } from './src/auth/AuthProvider';
-import { initializeFacebookSDK, initializeGoogleSignIn } from './src/services/socialAuth';
-<<<<<<< HEAD
 import { initializeGoogleAds } from './src/services/googleAds';
-=======
->>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
 
 // Screens
 import SplashScreen from './src/screens/SplashScreen';
@@ -36,13 +32,12 @@ import CustomQuote from './src/screens/CustomQuote';
 import DeleteAccountScreen from './src/screens/DeleteAccount';
 import NotificationScreen from './src/screens/NotificationsScreen';
 import AchievementsScreen from './src/screens/AchievementsScreen';
-<<<<<<< HEAD
 import WatchVideoScreen from './src/screens/WatchVideoScreen';
 import TwoFactorScreen from './src/screens/TwoFactorScreen';
 import NotificationPreferencesScreen from './src/screens/NotificationPreferencesScreen';
 import DailyRewardsScreen from './src/screens/DailyRewardsScreen';
-=======
->>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
+import CryptoDepositScreen from './src/screens/CryptoDepositScreen';
+import BalanceHistoryScreen from './src/screens/BalanceHistoryScreen';
 
 const RootStack = createStackNavigator<RootStackParamList>();
 
@@ -58,16 +53,15 @@ const AppNavigator = () => {
       {authenticated ? (
         <>
         <RootStack.Screen name="Main" component={MainTabNavigator} />
-<<<<<<< HEAD
+        <RootStack.Screen name="BalanceHistoryScreen" component={BalanceHistoryScreen} />
         <RootStack.Screen name="DailyRewardsScreen" component={DailyRewardsScreen} />
-=======
->>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
         <RootStack.Screen name="MyProfileScreen" component={MyProfileScreen} />
         <RootStack.Screen name="AllActivity" component={AllActivity} />
         <RootStack.Screen name="InternalReferral" component={InternalReferralScreen} />
         <RootStack.Screen name="Store" component={StoreScreen} />
         <RootStack.Screen name="Wallet" component={WalletScreen} />
         <RootStack.Screen name="DepositScreen" component={DepositScreen} />
+        <RootStack.Screen name="CryptoDepositScreen" component={CryptoDepositScreen} />
         <RootStack.Screen name="WithdrawScreen" component={WithdrawScreen} />
         <RootStack.Screen name="FAQScreen" component={FAQScreen} />
         <RootStack.Screen name="SupportScreen" component={SupportScreen} />
@@ -76,7 +70,6 @@ const AppNavigator = () => {
         <RootStack.Screen name="DeleteAccount" component={DeleteAccountScreen} />
         <RootStack.Screen name="NotificationScreen" component={NotificationScreen} />
         <RootStack.Screen name="AchievementsScreen" component={AchievementsScreen} />
-<<<<<<< HEAD
         <RootStack.Screen name="WatchVideoScreen" component={WatchVideoScreen} />
         <RootStack.Screen name="TwoFactorScreen" component={TwoFactorScreen} />
         <RootStack.Screen name="NotificationPreferencesScreen" component={NotificationPreferencesScreen} />
@@ -85,22 +78,16 @@ const AppNavigator = () => {
         <RootStack.Screen name="ChangePasswordScreen" component={ChangePasswordScreen} />
         <RootStack.Screen name="ChangePassword" component={ChangePasswordScreen} />
         <RootStack.Screen name="ReferralScreen" component={ReferralScreen} />
-=======
->>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
         </>
       ) : (
         <>
-          <RootStack.Screen name="Login" component={LoginScreen} />
           <RootStack.Screen name="SignUp" component={SignUpScreen} />
+          <RootStack.Screen name="Login" component={LoginScreen} />
           <RootStack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
           <RootStack.Screen name="OTPVerification" component={OTPVerificationScreen} />
           <RootStack.Screen name="ChangePassword" component={ChangePasswordScreen} />
           <RootStack.Screen name="TwofactorOTP" component={TwofactorOTP} />
           <RootStack.Screen name="ReferralScreen" component={ReferralScreen} />
-<<<<<<< HEAD
-=======
-          <RootStack.Screen name="Main" component={MainTabNavigator} />
->>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
         </>
       )}
     </RootStack.Navigator>
@@ -112,12 +99,7 @@ const App = () => {
 
   useEffect(() => {
     // Initialize social SDKs
-    initializeFacebookSDK();
-    initializeGoogleSignIn();
-<<<<<<< HEAD
     initializeGoogleAds();
-=======
->>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
   }, []);
 
   return (

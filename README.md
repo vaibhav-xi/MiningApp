@@ -12,8 +12,10 @@ npx react-native bundle --platform android --dev false --entry-file index.js \
 --bundle-output android/app/src/main/assets/index.android.bundle \
 --assets-dest android/app/src/main/res && \
 cd android && ./gradlew assembleDebug
-<<<<<<< HEAD
 
+Command Before doing xcode archieve: 
+
+npx react-native bundle --platform ios --dev false --entry-file index.js --bundle-output ios/main.jsbundle --assets-dest ios
 
 Install Everything: npm install --legacy-peer-deps
 
@@ -22,5 +24,3 @@ Run Android:
 windows - cd android ; ./gradlew clean ; cd ..
 
 npx react-native run-android
-=======
->>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042

@@ -28,6 +28,10 @@ type SignUpScreenNavigationProp = StackNavigationProp<RootStackParamList, 'SignU
 const SignUpScreen: React.FC<SignUpScreenProps> = () => {
   const [name, setName] = useState('');
     const [email, setEmail] = useState('');
+    
+    const [referral_code, setReferral] = useState('');
+    const [referralError, setReferralError] = useState('');
+
     const [password, setPassword] = useState('');
     const [nameError, setNameError] = useState('');
     const [emailError, setEmailError] = useState('');
@@ -93,6 +97,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = () => {
             name: name.trim(),
             email: email.toLowerCase(),
             password: password,
+            referral_code: referral_code.trim().toLowerCase(),
           }),
         });
   
@@ -118,37 +123,6 @@ const SignUpScreen: React.FC<SignUpScreenProps> = () => {
         Alert.alert('Error', error.message || 'Network error. Please check your connection.');
       }
     };
-  
-    const handleSocialSignUpSuccess = async (userData: any) => {
-      try {
-        console.log('Social Sign Up Success:', userData);
-
-        // Authenticate user with the auth context
-        await login(userData.token, userData.user);
-
-        // Always navigate to referral screen after social signup
-        Alert.alert(
-          'Signup Successful',
-          `Welcome ${userData.user?.name || 'User'}! Your account has been created successfully.`,
-          [
-            {
-              text: 'Continue',
-              onPress: () => {
-                navigation.replace('ReferralScreen');
-              },
-            },
-          ]
-        );
-      } catch (error) {
-        console.error('Social signup success handler error:', error);
-        Alert.alert('Error', 'Failed to complete signup. Please try again.');
-      }
-    };
-  
-    const handleSocialSignUpError = (error: string) => {
-      console.error('Social Sign Up Error:', error);
-      Alert.alert('Error', error);
-    };
 
   return (
     <ImageBackground
@@ -158,180 +132,161 @@ const SignUpScreen: React.FC<SignUpScreenProps> = () => {
 
       <StatusBar barStyle="light-content" backgroundColor="#1a1a2e" />
 
-      <SafeAreaView style={styles.safeArea}>
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          style={styles.keyboardAvoidingView}
+      <SafeAreaView style={{ flex: 1 }}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 50 : 0}
+      >
+        <ScrollView
+          contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', paddingHorizontal: 20, paddingVertical: 30 }}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
         >
-          <ScrollView
-            contentContainerStyle={styles.scrollContent}
-            showsVerticalScrollIndicator={false}
-            keyboardShouldPersistTaps="handled"
-            bounces={false}
-          >
-            <View style={styles.content}>
-            {/* Bitcoin Logo */}
+          <View style={{ flex: 1, justifyContent: 'center' }}>
+            
+            {/* Logo */}
             <View style={styles.logoContainer}>
               <View style={styles.bitcoinLogo}>
                 <Image
-                  source={require('../assets/images/btc_icon.png')}
+                  source={require('../assets/images/main_app_icon.png')}
                   style={styles.bitcoinImage}
                   resizeMode="contain"
                 />
               </View>
+              <Text style={styles.logoTagline}>Cloud Mining Made Simple</Text>
             </View>
 
-            <View style={styles.screenContainer}>
-              {/* Gradient Form Box */}
-              <LinearGradient
-                colors={['#1B202CAA', '#2E3646AA']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.formBox}
+            {/* Form Box */}
+            <LinearGradient
+              colors={['#1B202CAA', '#2E3646AA']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={{ borderRadius: 16, padding: Platform.OS === 'ios' ? 20 : 10 }}
+            >
+              {/* Name */}
+              <View style={{ marginBottom: 15 }}>
+                <View style={styles.inputWrapper}>
+                  <Image source={require('../assets/images/icon_input_box_user.png')} style={styles.inputIconImage} />
+                  <TextInput
+                    style={{ ...styles.input, flex: 1 }}
+                    placeholder="NAME"
+                    placeholderTextColor="#888"
+                    value={name}
+                    onChangeText={(text) => {
+                      setName(text);
+                      if (nameError) setNameError('');
+                    }}
+                    autoCapitalize="words"
+                    autoCorrect={false}
+                  />
+                </View>
+                {nameError ? <Text style={styles.errorText}>{nameError}</Text> : null}
+              </View>
+
+              {/* Email */}
+              <View style={{ marginBottom: 15 }}>
+                <View style={styles.inputWrapper}>
+                  <Image source={require('../assets/images/icon_input_box_email.png')} style={styles.inputIconImage} />
+                  <TextInput
+                    style={{ ...styles.input, flex: 1 }}
+                    placeholder="EMAIL"
+                    placeholderTextColor="#888"
+                    value={email}
+                    onChangeText={(text) => {
+                      setEmail(text);
+                      if (emailError) setEmailError('');
+                    }}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                  />
+                </View>
+                {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
+              </View>
+
+              {/* Password */}
+              <View style={{ marginBottom: 15 }}>
+                <View style={styles.inputWrapper}>
+                  <Image source={require('../assets/images/icon_input_box_pass.png')} style={styles.inputIconImage} />
+                  <TextInput
+                    style={{ ...styles.input, flex: 1 }}
+                    placeholder="PASSWORD"
+                    placeholderTextColor="#888"
+                    value={password}
+                    onChangeText={(text) => {
+                      setPassword(text);
+                      if (passwordError) setPasswordError('');
+                    }}
+                    secureTextEntry
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                  />
+                </View>
+                {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
+              </View>
+
+              <View style={{ marginBottom: 15 }}>
+                <View style={styles.inputWrapper}>
+                  <Image source={require('../assets/images/icon_input_box_pass.png')} style={styles.inputIconImage} />
+                  <TextInput
+                    style={{ ...styles.input, flex: 1 }}
+                    placeholder="REFERRAL (OPTIONAL)"
+                    placeholderTextColor="#888"
+                    value={referral_code}
+                    onChangeText={(text) => {
+                      setReferral(text);
+                      if (referralError) setReferralError('');
+                    }}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                  />
+                </View>
+                {referralError ? <Text style={styles.errorText}>{referralError}</Text> : null}
+              </View>
+
+              {/* Signup Button */}
+              <TouchableOpacity 
+                style={styles.loginButton} 
+                onPress={handleSignUp} 
+                disabled={isLoading}
+                activeOpacity={0.8}
               >
+                <LinearGradient
+                  colors={['#2ACFEF', '#BD85FC']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={styles.loginButtonGradient}
+                >
+                  <Text style={styles.loginButtonText}>
+                    {isLoading ? 'SIGNING IN...' : 'SIGNUP'}
+                  </Text>
+                </LinearGradient>
+              </TouchableOpacity>
 
-                <View style={styles.formContainer}>
+              {/* Already a user */}
+              <TouchableOpacity
+                style={{ marginTop: 10, alignItems: 'center' }}
+                onPress={() => navigation.navigate('Login' as never)}
+              >
+                <Text style={{ color: 'white', paddingBottom: Platform.OS === 'ios' ? 40 : 10, fontWeight: '600', marginLeft: Platform.OS === 'ios' ? '-10%' : 0 }}>Already a user? <Text style={styles.signUpLink}>Sign In</Text></Text>
+              </TouchableOpacity>
 
-                {/* Name Input */}
-                <View style={styles.inputContainer}>
-                  <View style={styles.inputWrapper}>
-                    <Image
-                        source={require('../assets/images/icon_input_box_user.png')}
-                        style={styles.inputIconImage}
-                        resizeMode="contain"
-                      />
-                    <TextInput
-                      style={styles.input}
-                      placeholder="NAME"
-                      placeholderTextColor="#888888"
-                      value={name}
-                      onChangeText={(text) => {
-                        setName(text);
-                        if (nameError) setNameError('');
-                      }}
-                      autoCapitalize="words"
-                      autoCorrect={false}
-                      selectionColor="#00d4ff"
-                      underlineColorAndroid="transparent"
-                    />
-                  </View>
-                  {nameError ? <Text style={styles.errorText}>{nameError}</Text> : null}
-                </View>
+            </LinearGradient>
 
-                  {/* Email Input */}
-                  <View style={styles.inputContainer}>
-                    <View style={styles.inputWrapper}>
-                      <Image
-                        source={require('../assets/images/icon_input_box_email.png')}
-                        style={styles.inputIconImage}
-                        resizeMode="contain"
-                      />
-                      <TextInput
-                        style={styles.input}
-                        placeholder="EMAIL"
-                        placeholderTextColor="#aaaaaa"
-                        value={email}
-                        onChangeText={(text) => {
-                          setEmail(text);
-                          if (emailError) setEmailError('');
-                        }}
-                        keyboardType="email-address"
-                        autoCapitalize="none"
-                        autoCorrect={false}
-                        selectionColor="#00d4ff"
-                        underlineColorAndroid="transparent"
-                      />
-                    </View>
-                    {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
-                  </View>
-
-                  {/* Password Input */}
-                  <View style={styles.inputContainer}>
-                    <View style={styles.inputWrapper}>
-                      <Image
-                        source={require('../assets/images/icon_input_box_pass.png')}
-                        style={styles.inputIconImage}
-                        resizeMode="contain"
-                      />
-                      <TextInput
-                        style={styles.input}
-                        placeholder="PASSWORD"
-                        placeholderTextColor="#aaaaaa"
-                        value={password}
-                        onChangeText={(text) => {
-                          setPassword(text);
-                          if (passwordError) setPasswordError('');
-                        }}
-                        secureTextEntry
-                        autoCapitalize="none"
-                        autoCorrect={false}
-                        selectionColor="#00d4ff"
-                        underlineColorAndroid="transparent"
-                      />
-                    </View>
-                    {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
-                  </View>
-
-                  {/* Login Button */}
-                  <LinearGradient
-                    colors={['#2ACFEF', '#BD85FC']}
-                    style={styles.loginButton}
-                    start={{x: 0, y: 0}}
-                    end={{x: 1, y: 0}}
-                  >
-                    <TouchableOpacity
-                      style={styles.loginButtonInner}
-                      onPress={handleSignUp}
-                      disabled={isLoading}
-                    >
-                      <Text style={styles.signUpButtonText}>
-                                            {isLoading ? 'please wait..' : 'SIGN UP'}
-                                          </Text>
-                    </TouchableOpacity>
-                  </LinearGradient>
-
-                 {/* Login Link */}
-                  <TouchableOpacity style={styles.signUpContainer} onPress={() => navigation.navigate('Login' as never)}>
-                     {/* <Text style={styles.signUpText}>
-                                       Already a user? <TouchableOpacity onPress={() => navigation.navigate('Login' as never)}><Text style={styles.loginLink}>Sign In</Text></TouchableOpacity>
-                                     </Text> */}
-                    <Text style={styles.signUpText}>
-                      Already a user? <Text style={styles.signUpLink}>Sign In</Text>
-                    </Text>
-                  </TouchableOpacity>
-                                     
-                </View>
-
-
-              </LinearGradient>
-
-              {/* Social Login */}
-                {/* <SocialLoginButtons
-                  onSuccess={handleSocialSignUpSuccess}
-                  onError={handleSocialSignUpError}
-                  disabled={isLoading}
-                /> */}
-
-            </View>
-
-            {/* Footer */}
             <View style={styles.footer}>
-              <Text style={styles.footerText}>Bitcoin Mining</Text>
+              <Text style={styles.footerText}>BitPlayPro</Text>
             </View>
+
           </View>
-          </ScrollView>
-        </KeyboardAvoidingView>
-      </SafeAreaView>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
     </ImageBackground>
   );
 };
 
 const styles = StyleSheet.create({
-  screenContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
 
   formBox: {
     width: '100%',
@@ -339,54 +294,16 @@ const styles = StyleSheet.create({
     padding: 16,
   },
 
+  loginButtonGradient: {
+    height: Platform.OS === 'ios' ? 40 : 50,       
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 25,
+  },
+
   container: {
     flex: 1,
     backgroundColor: '#1a1a2e',
-  },
-  backgroundPattern: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: '#1a1a2e',
-  },
-  geometricShape: {
-    position: 'absolute',
-    borderWidth: 1,
-    borderColor: 'rgba(139, 69, 255, 0.3)',
-  },
-  shape1: {
-    width: 200,
-    height: 200,
-    borderRadius: 100,
-    top: -100,
-    right: -100,
-    borderColor: 'rgba(139, 69, 255, 0.2)',
-  },
-  shape2: {
-    width: 150,
-    height: 150,
-    borderRadius: 75,
-    bottom: 100,
-    left: -75,
-    borderColor: 'rgba(139, 69, 255, 0.15)',
-  },
-  shape3: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    top: 200,
-    left: 50,
-    borderColor: 'rgba(139, 69, 255, 0.1)',
-  },
-  shape4: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    bottom: 300,
-    right: 30,
-    borderColor: 'rgba(139, 69, 255, 0.2)',
   },
   safeArea: {
     flex: 1,
@@ -399,24 +316,22 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    paddingHorizontal: 20,
+    paddingHorizontal: Platform.OS === 'ios' ? 0 : 20,
     justifyContent: 'center',
   },
   logoContainer: {
     alignItems: 'center',
-    marginTop: 50,
   },
 
   bitcoinLogo: {
-    width: 100,
-    height: 100,
+    width: 200,
+    height: 200,
     justifyContent: 'center',
     alignItems: 'center',
   },
   bitcoinImage: {
     width: '100%',
     height: '100%',
-    transform: [{ rotate: '3deg' }],
   },
   bitcoinSymbol: {
     fontSize: 80,
@@ -437,8 +352,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.2)',
     paddingHorizontal: 15,
-    paddingVertical: 18,
+    paddingVertical: 10,
     height: 55,
+    width: Platform.OS === 'ios' ? 280 : 350
   },
   inputIcon: {
     fontSize: 16,
@@ -454,7 +370,7 @@ const styles = StyleSheet.create({
     textAlignVertical: 'center',
     includeFontPadding: false,
     paddingVertical: 0,
-    margin: 0,
+    margin: 0
   },
   errorText: {
     color: '#ff6b6b',
@@ -469,6 +385,7 @@ const styles = StyleSheet.create({
     height: 45,
     width: 160,
     alignSelf: 'center',
+    marginLeft: Platform.OS === 'ios' ? '-10%' : 0
   },
   loginButtonInner: {
     flex: 1,
@@ -481,7 +398,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     letterSpacing: 1,
   },
-signUpButtonText: {
+  signUpButtonText: {
     color: '#ffffff',
     fontSize: 14,
     fontWeight: 'bold',
@@ -562,14 +479,14 @@ signUpButtonText: {
   footer: {
     alignItems: 'center',
     position: 'absolute',
-    bottom: 30,
+    bottom: -5,
     left: 0,
     right: 0,
   },
   footerText: {
     color: '#ffffff',
     fontSize: 13,
-    fontWeight: '400',
+    fontWeight: '400'
   },
   testApiButton: {
     backgroundColor: '#333',
@@ -590,10 +507,19 @@ signUpButtonText: {
     height: '100%',
   },
   inputIconImage: {
-  width: 20,
-  height: 20,
-  marginRight: 8,
-},
+    width: 20,
+    height: 20,
+    marginRight: 8,
+  },
+  logoTagline: {
+    fontSize: 16,
+    color: '#42B0FF',
+    fontWeight: '500',
+    textAlign: 'center',
+    lineHeight: 22,
+    letterSpacing: 0.5,
+    marginBottom: Platform.OS === 'ios' ? 10 : 30
+  }
 });
 
 export default SignUpScreen;

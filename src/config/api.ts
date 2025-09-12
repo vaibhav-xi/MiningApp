@@ -4,13 +4,9 @@
  */
 
 // Production API URL (Render deployment) - Working live server
-<<<<<<< HEAD
 
-const SERVER_URL = 'http://31.97.189.9'
+const SERVER_URL = 'https://dashboard.bitplaypro.com'
 const PRODUCTION_API_URL = `${SERVER_URL}/mobile_api`;
-=======
-const PRODUCTION_API_URL = 'http://31.97.189.9/mobile_api';
->>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
 
 // Development API URLs (for local testing with cloud database)
 const DEVELOPMENT_API_URLS = {
@@ -23,11 +19,17 @@ const DEVELOPMENT_API_URLS = {
 // This provides live server with cloud data persistence - fully deployed solution
 export const API_BASE_URL = PRODUCTION_API_URL;
 
-<<<<<<< HEAD
 export const DATA_ENDPOINTS = {
+  CREATE_WITHDRAWAL: "/api/withdrawals",
+  GET_BALANCE_HISTORY: "/api/wallet/history",
+  SET_WALLET_BALANCE: '/api/wallet/balance',
+  GET_WALLET_BALANCE: '/api/wallet/balance',
+  GET_DEPOSIT_ADDRESS: '/api/deposit-address',
   GET_FAQS: '/api/faqs',
+  GET_REWARDS: '/api/daily-rewards',
   GET_SUBSCRIPTIONS: '/api/subscriptionplans',
   CREATE_SUPPORT_TICKET: '/api/help/create',
+  REFERRALS: '/api/referrals',
 } as const;
 
 type DataEndpointKey = keyof typeof DATA_ENDPOINTS;
@@ -36,14 +38,13 @@ export const get_data_uri = (endpoint: DataEndpointKey): string => {
   return `${SERVER_URL}${DATA_ENDPOINTS[endpoint]}`;
 };
 
-=======
->>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
 // API Endpoints
 export const API_ENDPOINTS = {
   // Authentication
   LOGIN: '/api/auth/login',
   LOGOUT: '/api/auth/logout',
   REGISTER: '/api/auth/register',
+  REFERRALS: '/api/referrals',
   SOCIAL_LOGIN: '/api/auth/social-login',
   ME: '/api/auth/me',
   FORGOT_PASSWORD: '/api/auth/forgotpassword',
@@ -66,11 +67,7 @@ export const getApiUrl = (endpoint: string): string => {
 
 // API Configuration
 export const API_CONFIG = {
-<<<<<<< HEAD
   timeout: 10000,
-=======
-  timeout: 10000, // 10 seconds
->>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
   headers: {
     'Content-Type': 'application/json',
   },
@@ -143,9 +140,6 @@ export default {
   API_ENDPOINTS,
   getApiUrl,
   apiRequest,
-<<<<<<< HEAD
   get_data_uri,
   DATA_ENDPOINTS
-=======
->>>>>>> f7f1493ea098c61d7f951a8ccad8f6d40cd12042
 };
