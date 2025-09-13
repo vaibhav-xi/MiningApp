@@ -18,6 +18,8 @@ import Icon from "react-native-vector-icons/Ionicons";
 import LottieView from "lottie-react-native";
 import { get_data_uri } from '../config/api';
 import { useAuth } from '../auth/AuthProvider';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useHashPower } from "../stores/HashPowerStore";
 
 type NavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -43,6 +45,8 @@ const DailyRewardsScreen = () => {
 
   const navigation = useNavigation<NavigationProp>();
 
+  const { hashPower, setHashPower, addHashPower } = useHashPower();
+
   const { user } = useAuth();
 
   const user_id = user?.id;
@@ -66,7 +70,7 @@ const DailyRewardsScreen = () => {
     fetchRewards();
   }, []);
 
-  const handleClaim = async (rewardId: string) => {
+  const handleClaim = async (rewardId: string, reward_amount: any) => {
     try {
       const res = await fetch(`${API_BASE}/claim`, {
         method: "POST",
@@ -75,6 +79,8 @@ const DailyRewardsScreen = () => {
       });
 
       const data = await res.json();
+
+      addHashPower(parseInt(reward_amount));
 
       if (data.success) {
         // Update UI
@@ -141,7 +147,7 @@ const DailyRewardsScreen = () => {
               >
                 <TouchableOpacity
                   style={styles.claimTouchable}
-                  onPress={() => handleClaim(reward._id)}
+                  onPress={() => handleClaim(reward._id, reward.amount)}
                 >
                   <Text style={styles.claimText}>Claim</Text>
                 </TouchableOpacity>
