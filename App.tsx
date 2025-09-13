@@ -38,10 +38,15 @@ import NotificationPreferencesScreen from './src/screens/NotificationPreferences
 import DailyRewardsScreen from './src/screens/DailyRewardsScreen';
 import CryptoDepositScreen from './src/screens/CryptoDepositScreen';
 import BalanceHistoryScreen from './src/screens/BalanceHistoryScreen';
-
 import { HashPowerProvider } from "./src/stores/HashPowerStore";
 
+import messaging from '@react-native-firebase/messaging';
+
 const RootStack = createStackNavigator<RootStackParamList>();
+
+messaging().setBackgroundMessageHandler(async remoteMessage => {
+  console.log('FirebaseLG - Message handled in the background:', remoteMessage);
+});
 
 const AppNavigator = () => {
   const { authenticated, loading } = useAuth();
@@ -99,9 +104,29 @@ const AppNavigator = () => {
 const App = () => {
   const isDarkMode = useColorScheme() === 'dark';
 
+  async function requestUserPermission() {
+    const authStatus = await messaging().requestPermission();
+    const enabled =
+      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+      authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+
+    if (enabled) {
+      console.log('Firebase Authorization status:', authStatus);
+    }
+  }
+
   useEffect(() => {
     // Initialize social SDKs
     initializeGoogleAds();
+    requestUserPermission();
+  }, []);
+
+  useEffect(() => {
+    const unsubscribe = messaging().onMessage(async remoteMessage => {
+      console.log('FirebaseLG - Foreground message received:', remoteMessage);
+    });
+
+    return unsubscribe;
   }, []);
 
   return (
